@@ -120,3 +120,46 @@ def test_voice_falls_back_to_silent_when_provider_fails(tmp_path, monkeypatch):
     config["voice"]["provider"] = "edge-tts"
     _, durations = voice.generate_voice({"scenes": [{"narration": "hello there"}]}, config, tmp_path / "voice")
     assert durations[0] >= voice.MIN_SCENE
+
+
+def test_crop_9_16():
+    from PIL import Image
+    from wuhanbites.image_providers import crop_9_16
+
+    for size in ((1024, 1536), (1536, 1024), (900, 1600)):
+        w, h = crop_9_16(Image.new("RGB", size)).size
+        assert abs(w / h - 9 / 16) < 0.01
+
+
+def test_providers_parse_responses(monkeypatch):
+    import base64, io
+    from PIL import Image
+    from wuhanbites import image_providers as ip
+
+    buf = io.BytesIO()
+    Image.new("RGB", (1024, 1536), "red").save(buf, "PNG")
+    b64 = base64.b64encode(buf.getvalue()).decode()
+    seen = {}
+
+    def fake_post(url, body, headers):
+        seen[url] = (body, headers)
+        return {"predictions": [{"bytesBase64Encoded": b64}]} if "googleapis" in url else {"data": [{"b64_json": b64}]}
+
+    monkeypatch.setattr(ip, "_post", fake_post)
+    monkeypatch.setenv("GEMINI_API_KEY", "g")
+    monkeypatch.setenv("OPENAI_API_KEY", "o")
+    for provider in ("google", "openai"):
+        w, h = ip.generate(provider, "a bowl").size
+        assert abs(w / h - 9 / 16) < 0.01
+    google_body = next(b for u, (b, _) in seen.items() if "googleapis" in u)
+    assert google_body["parameters"]["aspectRatio"] == "9:16"
+
+
+def test_missing_key_message(monkeypatch):
+    import pytest
+    from wuhanbites import image_providers as ip
+
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="GEMINI_API_KEY"):
+        ip.generate("google", "x")

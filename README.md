@@ -43,6 +43,21 @@ Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.mp3` (or `.w
 - Scenes live in `topics/*.yaml`: `narration`, `caption` and `visual` (`skyline lanterns bowl pocket ring pot lotus wok follow`). Add a topic by copying one.
 - The images are original illustrations, not photos. Say so if a platform asks whether content is AI-generated or illustrated.
 
+## Comparing image providers
+
+Photo-style scenes need a text-to-image API key (not included). To compare providers side by side:
+
+```bash
+export GEMINI_API_KEY=...      # Google AI Studio key (Imagen needs billing enabled, as far as I know)
+export OPENAI_API_KEY=...      # OpenAI key; set only one if you want just one provider
+python3 -m wuhanbites.compare_images
+open output/compare/sheet.png
+```
+
+It makes the same 3 scenes with each provider that has a key (costs a few cents per image).
+Model names are options: `--google-model imagen-4.0-fast-generate-001`, `--openai-model gpt-image-1-mini`.
+Keys are read from the environment only; never put them in `config.yaml` or commit them.
+
 ## Finance ledger
 
 ```bash
