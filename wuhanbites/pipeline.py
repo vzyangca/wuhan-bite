@@ -29,10 +29,10 @@ def run(slug: str, upload: bool = False) -> None:
     images = generate_images(script, config, out / "images")
     print(f"images: {len(images)}")
 
-    audio = generate_voice(script, config, out / "voice")
-    print(f"voice: {audio.name}")
+    audio, durations = generate_voice(script, config, out / "voice")
+    print(f"voice: {audio.name} ({sum(durations):.0f}s)")
 
-    video = assemble_video(images, audio, config, out / "video.mp4")
+    video = assemble_video(images, audio, durations, config, out / "video.mp4")
     print(f"video: {video}")
 
     publish(build_manifest(topic, script, video, config), out, config)

@@ -46,3 +46,77 @@ def test_youtube_rejects_bad_privacy():
 
     with pytest.raises(ValueError):
         youtube_settings({"publish": {"youtube": {"privacy": "everyone"}}})
+
+
+def test_every_scene_has_known_visual_and_text():
+    from wuhanbites.images import VISUALS
+
+    for slug, topic in load_topics().items():
+        assert topic["scenes"][0]["narration"] == topic["hook"], slug
+        assert topic["scenes"][-1]["narration"] == topic["call_to_action"], slug
+        for s in topic["scenes"]:
+            assert s["visual"] in VISUALS and s["caption"] and s["narration"], (slug, s)
+
+
+def test_all_visuals_render(tmp_path):
+    from PIL import Image
+    from wuhanbites.images import VISUALS, illustrated_image
+
+    for i, v in enumerate(VISUALS):
+        p = illustrated_image({"visual": v, "caption": "A Long Headline For Testing", "narration": "Some narration text."},
+                              i, (270, 480), tmp_path / f"{v}.png")
+        assert Image.open(p).size == (270, 480)
+
+
+def _have_ffmpeg():
+    import shutil
+    return bool(shutil.which("ffmpeg") and shutil.which("ffprobe"))
+
+
+def test_voice_and_video_timing_follow_narration(tmp_path, monkeypatch):
+    import subprocess
+    import pytest
+
+    if not _have_ffmpeg():
+        pytest.skip("ffmpeg not installed")
+    from wuhanbites import voice
+    from wuhanbites.assemble import assemble_video
+    from wuhanbites.images import generate_images
+
+    def fake_tts(text, voice_name, out):  # stand-in for edge-tts: longer text -> longer clip
+        secs = 0.2 * len(text.split())
+        subprocess.run(["ffmpeg", "-y", "-f", "lavfi", "-i", f"sine=frequency=300:duration={secs}", str(out)],
+                       check=True, capture_output=True)
+        return out
+
+    monkeypatch.setattr(voice, "edge_tts_clip", fake_tts)
+    config = load_config()
+    config["voice"]["provider"] = "edge-tts"
+    config["video"].update(width=180, height=320, fps=10)
+    script = {"scenes": [
+        {"narration": "one two three", "caption": "A", "visual": "bowl"},
+        {"narration": " ".join(["word"] * 30), "caption": "B", "visual": "wok"},
+    ]}
+    audio, durations = voice.generate_voice(script, config, tmp_path / "voice")
+    assert durations[1] > durations[0] + 3          # long scene lasts longer
+    assert durations[0] >= voice.MIN_SCENE
+    images = generate_images(script, config, tmp_path / "img")
+    video = assemble_video(images, audio, durations, config, tmp_path / "v.mp4")
+    assert abs(voice.duration(video) - sum(durations)) < 0.5
+
+
+def test_voice_falls_back_to_silent_when_provider_fails(tmp_path, monkeypatch):
+    import pytest
+
+    if not _have_ffmpeg():
+        pytest.skip("ffmpeg not installed")
+    from wuhanbites import voice
+
+    def boom(*a, **k):
+        raise RuntimeError("no network")
+
+    monkeypatch.setattr(voice, "edge_tts_clip", boom)
+    config = load_config()
+    config["voice"]["provider"] = "edge-tts"
+    _, durations = voice.generate_voice({"scenes": [{"narration": "hello there"}]}, config, tmp_path / "voice")
+    assert durations[0] >= voice.MIN_SCENE

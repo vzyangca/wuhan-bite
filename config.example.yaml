@@ -9,10 +9,11 @@ script:
   provider: template        # template | anthropic
   model: claude-sonnet-5-5
 voice:
-  provider: silent          # silent | edge-tts
-  voice_name: en-US-AriaNeural
+  provider: auto            # auto | edge-tts | macos-say | silent
+  voice_name: en-US-AriaNeural   # edge-tts voice
+  say_voice: Samantha            # macOS `say` voice (see: say -v '?')
 images:
-  provider: placeholder     # placeholder (add your own provider in images.py)
+  provider: illustrated     # illustrated | placeholder
 publish:
   dry_run: true
   platforms: [youtube_shorts]   # tiktok, instagram_reels: no uploader yet

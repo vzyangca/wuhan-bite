@@ -1,25 +1,64 @@
-# Facts here are the only source the offline script generator uses.
-# Verify before publishing.
+# `scenes` drive the video. Each scene: narration (spoken, also shown as subtitle),
+# caption (headline), visual (one of: skyline lanterns bowl pocket ring pot lotus wok follow).
+# Verify every food claim before publishing; the generator does not fact-check.
 topics:
   - slug: re-gan-mian
     title: Re Gan Mian (Hot Dry Noodles)
     hook: "If you only eat one breakfast in Wuhan, make it this."
+    call_to_action: "Follow for more Wuhan street food."
     facts:
       - "Re gan mian is the signature breakfast noodle of Wuhan."
-      - "Alkaline noodles are blanched, tossed in sesame paste, soy sauce and pickles."
-      - "It is eaten dry, not in broth, and is often paired with egg drink."
-    call_to_action: "Follow for more Wuhan street food."
+      - "Alkaline noodles are boiled ahead, tossed in oil to cool, then dipped in hot water when ordered."
+      - "Topped with sesame paste, soy sauce, pickles and scallions; eaten dry, not in broth."
+    scenes:
+      - {visual: bowl, caption: "Hot Dry Noodles", narration: "If you only eat one breakfast in Wuhan, make it this."}
+      - {visual: skyline, caption: "Wuhan's Signature Breakfast", narration: "Meet re gan mian, which means hot dry noodles. It is the signature breakfast of Wuhan."}
+      - {visual: wok, caption: "Cooked Ahead", narration: "The noodles are boiled ahead, tossed in oil to cool, then dipped in hot water again when you order."}
+      - {visual: bowl, caption: "Sesame, Soy, Pickles", narration: "Then comes the topping: sesame paste, soy sauce, pickled vegetables and fresh scallions."}
+      - {visual: lanterns, caption: "No Broth Needed", narration: "It is eaten dry, with no broth, and locals often pair it with a warm drink."}
+      - {visual: follow, caption: "Wuhan Bites", narration: "Follow for more Wuhan street food."}
   - slug: doupi
-    title: Doupi (Tofu-Skin Pocket)
+    title: Doupi (Sticky Rice Pocket)
     hook: "Crispy outside, sticky and savory inside."
-    facts:
-      - "Doupi is a thin bean-curd skin wrapped around sticky rice and fillings."
-      - "It is pan-fried until golden and often sold for breakfast."
     call_to_action: "Which filling would you try?"
+    facts:
+      - "Doupi has a thin golden skin made from a batter, cooked on a large round griddle."
+      - "Sticky rice with pork, mushrooms and dried tofu is spread on the skin, then pan-fried."
+      - "It is cut into squares and sold hot, mostly for breakfast."
+    scenes:
+      - {visual: pocket, caption: "Doupi", narration: "Crispy outside, sticky and savory inside."}
+      - {visual: skyline, caption: "A Wuhan Classic", narration: "Doupi is a Wuhan breakfast classic, a thin golden skin wrapped around sticky rice."}
+      - {visual: wok, caption: "Griddle Made", narration: "The skin is made from a batter, spread thin on a big hot griddle."}
+      - {visual: pocket, caption: "Packed With Flavor", narration: "Sticky rice goes on top with pork, mushrooms and dried tofu, then it is pan-fried until golden."}
+      - {visual: lanterns, caption: "Hot From The Stall", narration: "It is cut into squares and sold hot at street stalls, mostly for breakfast."}
+      - {visual: follow, caption: "Wuhan Bites", narration: "Which filling would you try?"}
   - slug: mian-wo
     title: Mian Wo (Wuhan Doughnut)
     hook: "The round Wuhan doughnut with a savory twist."
+    call_to_action: "Comment your favorite street snack."
     facts:
       - "Mian wo is a fried, ring-shaped snack made from rice and soybean batter."
-      - "It is crisp outside and soft inside, usually eaten fresh from the fryer."
-    call_to_action: "Comment your favorite street snack."
+      - "The batter is mixed with scallions and sesame, and fried in a small round ladle."
+      - "Crisp outside, soft inside, usually eaten fresh from the fryer."
+    scenes:
+      - {visual: ring, caption: "Mian Wo", narration: "The round Wuhan doughnut with a savory twist."}
+      - {visual: skyline, caption: "From Wuhan", narration: "Mian wo is a fried snack from Wuhan, shaped like a little ring with a thin middle."}
+      - {visual: wok, caption: "Rice And Soybean Batter", narration: "The batter is made from rice and soybeans, mixed with scallions and sesame."}
+      - {visual: ring, caption: "Fried In A Ladle", narration: "It is poured into a small round ladle and fried in hot oil until the edge turns crisp."}
+      - {visual: lanterns, caption: "Eat It Hot", narration: "Crisp outside, soft inside, and best eaten fresh from the fryer."}
+      - {visual: follow, caption: "Wuhan Bites", narration: "Comment your favorite street snack."}
+  - slug: lotus-pork-rib-soup
+    title: Lotus Root and Pork Rib Soup
+    hook: "The comfort soup Wuhan is famous for."
+    call_to_action: "Follow for more Wuhan food."
+    facts:
+      - "Lotus root and pork ribs are simmered slowly in a clay pot."
+      - "The lotus root turns soft and starchy; the broth becomes rich and mellow."
+      - "Lotus root slices have a pattern of small holes."
+    scenes:
+      - {visual: pot, caption: "Lotus Root Soup", narration: "The comfort soup Wuhan is famous for."}
+      - {visual: skyline, caption: "City Of Lakes", narration: "Wuhan is a city of lakes, and lotus grows across Hubei province."}
+      - {visual: pot, caption: "Slow Simmered", narration: "Chunks of lotus root and pork ribs are simmered slowly in a clay pot for a couple of hours."}
+      - {visual: lotus, caption: "Soft And Starchy", narration: "The lotus root turns soft and starchy, and the broth becomes rich and mellow."}
+      - {visual: lotus, caption: "Look For The Holes", narration: "Every slice has tiny holes, and that is how you know it is lotus root."}
+      - {visual: follow, caption: "Wuhan Bites", narration: "Follow for more Wuhan food."}

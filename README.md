@@ -28,12 +28,20 @@ Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.mp3` (or `.w
 
 | Stage | Module | Offline default | Real provider |
 |---|---|---|---|
-| Script | `script_gen.py` | Template from topic facts | Anthropic API (`ANTHROPIC_API_KEY`) |
-| Images | `images.py` | Pillow title cards | Plug an image-generation API into `generate_image()` |
-| Voice | `voice.py` | Silent track sized to script | `edge-tts` (free) if installed |
-| Assemble | `assemble.py` | ffmpeg slideshow + audio, 9:16 | - |
+| Script | `script_gen.py` | Scenes from `topics/*.yaml` | Anthropic API (`ANTHROPIC_API_KEY`) |
+| Images | `images.py` | Original flat illustrations drawn with Pillow, plus headline and subtitle | Plug an image-generation API into `generate_image()` |
+| Voice | `voice.py` | `auto`: edge-tts (internet), else macOS `say`, else silent | One clip per scene, so scene length follows the narration |
+| Assemble | `assemble.py` | ffmpeg, 9:16, slow zoom, timed to narration | - |
 | Publish | `publish.py` | Dry run, writes manifest | Add platform uploaders |
 | Finance | `finance.py` | CSV ledger + summary | - |
+
+## Voice and look
+
+- `voice.provider: auto` tries `edge-tts` first (free, needs internet), then the macOS `say` voice (offline), then a silent track. The console prints which one was used.
+- Pick a different voice with `voice.voice_name` (edge-tts, e.g. `en-US-GuyNeural`) or `voice.say_voice` (macOS, list with `say -v '?'`).
+- If you copied `config.example.yaml` earlier, copy it again (or set `voice.provider: auto` and `images.provider: illustrated`) to pick up the new defaults.
+- Scenes live in `topics/*.yaml`: `narration`, `caption` and `visual` (`skyline lanterns bowl pocket ring pot lotus wok follow`). Add a topic by copying one.
+- The images are original illustrations, not photos. Say so if a platform asks whether content is AI-generated or illustrated.
 
 ## Finance ledger
 

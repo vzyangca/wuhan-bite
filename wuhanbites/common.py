@@ -10,8 +10,8 @@ DEFAULT_CONFIG = {
     "channel_name": "Wuhan Bites",
     "video": {"width": 1080, "height": 1920, "fps": 30, "seconds_per_scene": 4},
     "script": {"provider": "template", "model": "claude-sonnet-5-5"},
-    "voice": {"provider": "silent", "voice_name": "en-US-AriaNeural"},
-    "images": {"provider": "placeholder"},
+    "voice": {"provider": "auto", "voice_name": "en-US-AriaNeural", "say_voice": "Samantha"},
+    "images": {"provider": "illustrated"},
     "publish": {"dry_run": True, "platforms": ["youtube_shorts"], "youtube": {}},
 }
 
