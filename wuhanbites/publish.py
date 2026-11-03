@@ -22,6 +22,15 @@ def publish(manifest: dict, out_dir: Path, config: dict) -> Path:
     if config["publish"]["dry_run"]:
         print(f"[dry-run] manifest written to {path}; nothing uploaded.")
         return path
-    raise NotImplementedError(
-        "Add a platform uploader (YouTube Data API, TikTok Content Posting API, ...) here."
-    )
+    results = {}
+    for platform in manifest["platforms"]:
+        if platform == "youtube_shorts":
+            from .youtube import upload
+
+            results[platform] = upload(manifest, config)
+            print(f"youtube_shorts: {results[platform]['url']} ({results[platform]['privacy']})")
+        else:
+            print(f"{platform}: no uploader implemented yet, skipped.")
+    manifest["results"] = results
+    path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
+    return path

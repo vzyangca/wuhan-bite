@@ -5,3 +5,6 @@ output/
 config.yaml
 .env
 .DS_Store
+secrets/
+client_secret*.json
+*token*.json

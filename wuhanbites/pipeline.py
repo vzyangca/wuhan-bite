@@ -11,8 +11,10 @@ from .script_gen import generate_script
 from .voice import generate_voice
 
 
-def run(slug: str) -> None:
+def run(slug: str, upload: bool = False) -> None:
     config = load_config()
+    if upload:
+        config["publish"]["dry_run"] = False
     topics = load_topics()
     if slug not in topics:
         raise SystemExit(f"Unknown topic '{slug}'. Try: {', '.join(topics)}")
@@ -42,12 +44,19 @@ def main(argv=None) -> None:
     sub.add_parser("list-topics")
     r = sub.add_parser("run")
     r.add_argument("--topic", required=True)
+    r.add_argument("--upload", action="store_true", help="really upload (default is dry run)")
+    sub.add_parser("auth-youtube", help="one-time YouTube login (opens a browser)")
     args = ap.parse_args(argv)
     if args.cmd == "list-topics":
         for slug, t in load_topics().items():
             print(f"{slug}\t{t['title']}")
+    elif args.cmd == "auth-youtube":
+        from .youtube import get_credentials
+
+        get_credentials(load_config(), allow_login=True)
+        print("YouTube login saved.")
     else:
-        run(args.topic)
+        run(args.topic, upload=args.upload)
 
 
 if __name__ == "__main__":

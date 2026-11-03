@@ -12,7 +12,7 @@ DEFAULT_CONFIG = {
     "script": {"provider": "template", "model": "claude-sonnet-5-5"},
     "voice": {"provider": "silent", "voice_name": "en-US-AriaNeural"},
     "images": {"provider": "placeholder"},
-    "publish": {"dry_run": True, "platforms": ["tiktok", "youtube_shorts", "instagram_reels"]},
+    "publish": {"dry_run": True, "platforms": ["youtube_shorts"], "youtube": {}},
 }
 
 

@@ -15,4 +15,9 @@ images:
   provider: placeholder     # placeholder (add your own provider in images.py)
 publish:
   dry_run: true
-  platforms: [tiktok, youtube_shorts, instagram_reels]
+  platforms: [youtube_shorts]   # tiktok, instagram_reels: no uploader yet
+  youtube:
+    privacy: private        # private | unlisted | public (start private!)
+    category_id: "19"       # 19 Travel & Events, 26 Howto & Style
+    client_secret: secrets/client_secret.json
+    token: secrets/youtube_token.json

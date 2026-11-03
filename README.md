@@ -45,6 +45,37 @@ python -m wuhanbites.finance summary
 
 Data is stored in `data/ledger.csv`.
 
+## Publishing to YouTube Shorts
+
+Default is a dry run. Real uploads are opt-in and start as **private** videos.
+
+One-time setup:
+
+1. [Google Cloud Console](https://console.cloud.google.com/) -> create a project -> enable **YouTube Data API v3**.
+2. APIs & Services -> OAuth consent screen: choose External, add your own Google account as a **test user**.
+3. Credentials -> Create credentials -> **OAuth client ID** -> type **Desktop app** -> download the JSON.
+4. Save it as `secrets/client_secret.json` (the `secrets/` folder is git-ignored; never commit it).
+5. Install and log in:
+
+```bash
+pip install -r requirements-youtube.txt
+python3 -m wuhanbites.pipeline auth-youtube      # opens a browser, saves secrets/youtube_token.json
+```
+
+Upload:
+
+```bash
+python3 -m wuhanbites.pipeline run --topic re-gan-mian --upload
+```
+
+Notes:
+
+- Check `publish.youtube.privacy` in `config.yaml` (`private` by default). Review the video in YouTube Studio, then set it public there.
+- Uploads from API projects that have not passed YouTube's audit are locked to private. Request an audit if you want public API uploads.
+- Each upload costs about 1,600 of the default 10,000 daily quota units.
+- The AI-content disclosure is sent automatically (`containsSyntheticMedia`).
+- TikTok and Instagram Reels have no uploader yet; they are skipped.
+
 ## Notes
 
 - Check each platform's policy on AI-generated content and label it as required.
