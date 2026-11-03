@@ -1,5 +1,6 @@
 channel_name: Wuhan Bites
-language: en
+language: en                # en | zh (or run with --lang zh)
+channel_name_zh: 武汉一口
 video:
   width: 1080
   height: 1920
@@ -12,6 +13,8 @@ voice:
   provider: auto            # auto | edge-tts | macos-say | silent
   voice_name: en-US-AriaNeural   # edge-tts voice
   say_voice: Samantha            # macOS `say` voice (see: say -v '?')
+  voice_name_zh: zh-CN-XiaoxiNeural   # Mandarin edge-tts voice (male: zh-CN-YunxiNeural)
+  say_voice_zh: Tingting         # macOS Mandarin voice; may need downloading in System Settings
 images:
   provider: auto            # auto (Google photos if GEMINI_API_KEY is set, else illustrations) | google | illustrated | placeholder
   google_model: imagen-4.0-generate-001   # e.g. imagen-4.0-fast-generate-001 (cheaper)

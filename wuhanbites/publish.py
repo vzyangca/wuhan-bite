@@ -5,11 +5,15 @@ from pathlib import Path
 
 
 def build_manifest(topic: dict, script: dict, video: Path, config: dict) -> dict:
-    title = f"{topic['title']} | {config['channel_name']}"
+    zh = config.get("language") == "zh"
+    title = (f"{topic.get('title_zh', topic['title'])} | {config.get('channel_name_zh', '武汉一口')}" if zh
+             else f"{topic['title']} | {config['channel_name']}")
     return {
+        "language": "zh-CN" if zh else "en",
         "title": title,
-        "description": " ".join(s["narration"] for s in script["scenes"]),
-        "tags": ["wuhan", "streetfood", "chinesefood", "shorts"],
+        "description": ("" if zh else " ").join(s["narration"] for s in script["scenes"]),
+        "tags": (["武汉", "武汉美食", "街头小吃", "中国美食", "shorts"] if zh
+                 else ["wuhan", "streetfood", "chinesefood", "shorts"]),
         "video": str(video),
         "ai_generated_disclosure": True,
         "platforms": config["publish"]["platforms"],

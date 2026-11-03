@@ -4,9 +4,23 @@ import json
 import os
 
 
-def template_script(topic: dict, channel: str) -> dict:
+def localize(topic: dict, lang: str) -> dict:
+    """Return a copy of the topic's scenes in `lang` ("en" or "zh"); each scene gets a `lang` key."""
+    scenes = []
+    for s in topic["scenes"]:
+        s = dict(s)
+        if lang == "zh":
+            if not (s.get("narration_zh") and s.get("caption_zh")):
+                raise SystemExit(f"Topic '{topic['slug']}' has no Mandarin text (narration_zh / caption_zh).")
+            s["narration"], s["caption"] = s["narration_zh"], s["caption_zh"]
+        s["lang"] = lang
+        scenes.append(s)
+    return {"title": topic.get("title_zh", topic["title"]) if lang == "zh" else topic["title"], "scenes": scenes}
+
+
+def template_script(topic: dict, channel: str, lang: str = "en") -> dict:
     if topic.get("scenes"):
-        return {"title": topic["title"], "scenes": [dict(s) for s in topic["scenes"]]}
+        return localize(topic, lang)
     scenes = [{"narration": topic["hook"], "caption": topic["title"]}]
     for fact in topic["facts"]:
         scenes.append({"narration": fact, "caption": fact.split(".")[0][:60]})
@@ -33,8 +47,9 @@ def anthropic_script(topic: dict, channel: str, model: str) -> dict:
 
 
 def generate_script(topic: dict, config: dict) -> dict:
+    lang = config.get("language", "en")
     channel = config["channel_name"]
     provider = config["script"]["provider"]
-    if provider == "anthropic" and os.environ.get("ANTHROPIC_API_KEY"):
+    if provider == "anthropic" and os.environ.get("ANTHROPIC_API_KEY") and lang == "en":
         return anthropic_script(topic, channel, config["script"]["model"])
-    return template_script(topic, channel)
+    return template_script(topic, config.get("channel_name_zh", channel) if lang == "zh" else channel, lang)

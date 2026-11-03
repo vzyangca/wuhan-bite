@@ -213,3 +213,59 @@ def test_auto_without_key_uses_illustrations(tmp_path, monkeypatch):
     monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
     config = load_config()
     assert images._wants_photos(config) is False
+
+
+def test_mandarin_text_present_for_every_scene():
+    for slug, topic in load_topics().items():
+        assert topic.get("title_zh"), slug
+        for s in topic["scenes"]:
+            assert s.get("caption_zh") and s.get("narration_zh"), (slug, s)
+            assert any("一" <= ch <= "鿿" for ch in s["narration_zh"])
+
+
+def test_localize_zh_and_en():
+    from wuhanbites.script_gen import template_script
+
+    topic = load_topics()["doupi"]
+    zh = template_script(topic, "武汉一口", "zh")
+    assert zh["scenes"][0]["narration"] == topic["scenes"][0]["narration_zh"]
+    assert all(s["lang"] == "zh" for s in zh["scenes"])
+    en = template_script(topic, "Wuhan Bites", "en")
+    assert en["scenes"][0]["narration"] == topic["hook"]
+
+
+def test_chinese_wrap_has_no_leading_punctuation_and_fits(tmp_path):
+    from PIL import Image
+    from wuhanbites.images import NO_LINE_START, Canvas, illustrated_image
+
+    c = Canvas((540, 960), ((255, 255, 255), (0, 0, 0)))
+    text = "面条先煮熟，拌上油晾凉，点单的时候再放进热水里烫一下。"
+    lines = c.wrap(text, 54, 860).split("\n")
+    assert len(lines) >= 2 and "".join(lines) == text
+    assert all(l[0] not in NO_LINE_START for l in lines)
+    assert all(c.text_width(l, 54) <= 860 for l in lines)
+    p = illustrated_image({"visual": "follow", "caption": "武汉一口", "narration": text, "lang": "zh"},
+                          0, (270, 480), tmp_path / "zh.png", "武汉一口")
+    assert Image.open(p).size == (270, 480)
+
+
+def test_speech_seconds_for_chinese():
+    from wuhanbites.voice import speech_seconds
+
+    assert 3 < speech_seconds("面条先煮熟，拌上油晾凉，点单的时候再放进热水里烫一下。") < 9
+    assert speech_seconds("one two three") < 2
+
+
+def test_zh_manifest_and_youtube_language():
+    from wuhanbites.publish import build_manifest
+    from wuhanbites.script_gen import template_script
+    from wuhanbites.youtube import build_body
+
+    config = load_config()
+    config["language"] = "zh"
+    topic = load_topics()["re-gan-mian"]
+    script = template_script(topic, "武汉一口", "zh")
+    m = build_manifest(topic, script, "v.mp4", config)
+    assert m["language"] == "zh-CN" and m["title"].startswith("热干面")
+    body = build_body(m, config)
+    assert body["snippet"]["defaultAudioLanguage"] == "zh-CN"

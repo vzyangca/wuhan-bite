@@ -31,13 +31,37 @@ FONT_CANDIDATES = [
 ]
 
 
-def _font(size: int):
+CJK_FONT_CANDIDATES = [  # (path, collection index); Simplified Chinese faces first
+    ("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc", 2),
+    ("/System/Library/Fonts/Hiragino Sans GB.ttc", 1),
+    ("/System/Library/Fonts/PingFang.ttc", 0),
+    ("/System/Library/Fonts/STHeiti Medium.ttc", 0),
+    ("/Library/Fonts/Arial Unicode.ttf", 0),
+    ("/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc", 0),
+]
+
+
+def has_cjk(s: str) -> bool:
+    return any("\u4e00" <= ch <= "\u9fff" or "\u3000" <= ch <= "\u303f" or "\uff00" <= ch <= "\uffef" for ch in s)
+
+
+def _font(size: int, cjk: bool = False):
+    if cjk:
+        for path, index in CJK_FONT_CANDIDATES:
+            try:
+                return ImageFont.truetype(path, size, index=index)
+            except OSError:
+                continue
+        print("images: no Chinese font found; Chinese text will show as boxes. Install Noto Sans CJK or use macOS.")
     for name in FONT_CANDIDATES:
         try:
             return ImageFont.truetype(name, size)
         except OSError:
             continue
     return ImageFont.load_default()
+
+
+NO_LINE_START = set("，。！？、；：）》」』”’…—")
 
 
 def _cover(img: Image.Image, size: tuple[int, int]) -> Image.Image:
@@ -64,6 +88,7 @@ class Canvas:
             self.img = Image.composite(Image.new("RGB", (w, h), bottom), Image.new("RGB", (w, h), top), grad)
         self.d = ImageDraw.Draw(self.img, "RGBA")
         self.bottom = bottom
+        self.lang = "en"
 
     def _b(self, b):
         return [v * self.k for v in b]
@@ -90,24 +115,46 @@ class Canvas:
         self.d.line(self._pts(pts), fill=fill, width=max(1, round(w * self.k)), joint="curve")
 
     def text(self, xy, s, size, fill="white", anchor="mm", shadow=True, align="center", spacing=8):
-        f = _font(round(size * self.k))
+        f = _font(round(size * self.k), has_cjk(s))
         x, y = xy[0] * self.k, xy[1] * self.k
         if shadow:
             self.d.multiline_text((x + 4 * self.k, y + 5 * self.k), s, font=f, fill=(0, 0, 0, 120),
                                   anchor=anchor, align=align, spacing=spacing * self.k)
         self.d.multiline_text((x, y), s, font=f, fill=fill, anchor=anchor, align=align, spacing=spacing * self.k)
 
+    def text_width(self, s: str, size: int) -> float:
+        """Width in logical units."""
+        return _font(round(size * self.k), has_cjk(s)).getlength(s) / self.k
+
     def wrap(self, s: str, size: int, max_w: int) -> str:
-        f = _font(round(size * self.k))
-        lines, cur = [], ""
-        for word in s.split():
-            test = (cur + " " + word).strip()
-            if f.getlength(test) <= max_w * self.k or not cur:
-                cur = test
-            else:
-                lines.append(cur)
-                cur = word
-        return "\n".join(lines + [cur])
+        """Wrap to max_w, then narrow the width as far as the line count allows, so lines are balanced."""
+        cjk = has_cjk(s)
+        f = _font(round(size * self.k), cjk)
+        units = list(s) if cjk else s.split()  # Chinese has no spaces: break between characters
+        sep = "" if cjk else " "
+
+        def lines_at(limit: float) -> list[str]:
+            lines, cur = [], ""
+            for u in units:
+                test = (cur + sep + u) if cur else u
+                if f.getlength(test) <= limit or not cur or (cjk and u in NO_LINE_START):
+                    cur = test
+                else:
+                    lines.append(cur)
+                    cur = u
+            return lines + [cur]
+
+        hi = max_w * self.k
+        n = len(lines_at(hi))
+        if n > 1:
+            lo = hi * 0.5
+            for _ in range(14):
+                mid = (lo + hi) / 2
+                if len(lines_at(mid)) <= n:
+                    hi = mid
+                else:
+                    lo = mid
+        return "\n".join(lines_at(hi))
 
     def finish(self) -> Image.Image:
         return self.img.resize(self.size, Image.LANCZOS)
@@ -295,7 +342,7 @@ def art_lanterns(c, cx=540, cy=980):
         c.rect((x - 40 * s, top + 182 * s, x + 40 * s, top + 204 * s), (236, 190, 70), r=4)
         c.line([(x, top + 204 * s), (x, top + 270 * s)], (236, 190, 70), 6)
     c.ell((cx - 360, cy + 220, cx + 360, cy + 320), (0, 0, 0, 40))
-    c.text((cx, cy + 210), "street food stalls", 54, fill=(255, 244, 220), shadow=True)
+    c.text((cx, cy + 210), "街头小吃" if c.lang == "zh" else "street food stalls", 54, fill=(255, 244, 220), shadow=True)
 
 
 def art_follow(c, cx=540, cy=980):
@@ -305,7 +352,7 @@ def art_follow(c, cx=540, cy=980):
     c.ell((cx - 20, cy - 190, cx + 2 * r - 20, cy - 190 + 2 * r), (214, 40, 52))
     c.poly([(cx - 2 * r + 25, cy - 105), (cx + 2 * r - 25, cy - 105), (cx, cy + 90)], (214, 40, 52))
     c.rect((cx - 250, cy + 260, cx + 250, cy + 390), (214, 40, 52), r=64)
-    c.text((cx, cy + 325), "+  Follow", 78, fill="white", shadow=False)
+    c.text((cx, cy + 325), "+  关注" if c.lang == "zh" else "+  Follow", 78, fill="white", shadow=False)
 
 
 ART = {
@@ -326,8 +373,9 @@ def _overlay(c: Canvas, scene: dict, channel: str, scrim: bool = False) -> None:
                 mask = mask.transpose(Image.FLIP_TOP_BOTTOM)
             mask = mask.point(lambda v: int(255 * peak * (v / 255) ** 1.4))
             c.img.paste(Image.new("RGB", (w, hh), (0, 0, 0)), (0, round(y0 * c.k)), mask)
-    c.rect((60, 70, 60 + 24 * len(channel) + 90, 150), (0, 0, 0, 90), r=40)
-    c.text((60 + (24 * len(channel) + 90) / 2, 110), channel, 40, fill=(255, 240, 210), shadow=False)
+    bw = c.text_width(channel, 40) + 70
+    c.rect((60, 70, 60 + bw, 150), (0, 0, 0, 90), r=40)
+    c.text((60 + bw / 2, 110), channel, 40, fill=(255, 240, 210), shadow=False)
     size = 100
     head = c.wrap(scene["caption"], size, 920)
     while head.count("\n") >= 2 and size > 60:  # keep headlines to two lines
@@ -343,6 +391,7 @@ def _overlay(c: Canvas, scene: dict, channel: str, scrim: bool = False) -> None:
 
 def illustrated_image(scene: dict, idx: int, size: tuple[int, int], out: Path, channel: str = "Wuhan Bites") -> Path:
     c = Canvas(size, GRADIENTS[idx % len(GRADIENTS)])
+    c.lang = scene.get("lang", "en")
     for x, y, r in ((120, 380, 180), (960, 1500, 260), (900, 260, 110)):  # soft background shapes
         c.ell((x - r, y - r, x + r, y + r), (255, 255, 255, 22))
     ART.get(scene.get("visual"), art_lanterns)(c)
@@ -353,6 +402,7 @@ def illustrated_image(scene: dict, idx: int, size: tuple[int, int], out: Path, c
 
 def photo_image(scene: dict, photo: Image.Image, size: tuple[int, int], out: Path, channel: str = "Wuhan Bites") -> Path:
     c = Canvas(size, GRADIENTS[0], photo=photo)
+    c.lang = scene.get("lang", "en")
     _overlay(c, scene, channel, scrim=True)
     c.finish().save(out)
     return out
@@ -399,7 +449,7 @@ def generate_image(scene: dict, idx: int, config: dict, out: Path) -> Path:
     """Photos from Google when asked for (or `auto` with a key); otherwise, or on any failure,
     the local illustrated scene. Add other providers here: write a file to `out`, return it."""
     size = (config["video"]["width"], config["video"]["height"])
-    channel = config["channel_name"]
+    channel = config.get("channel_name_zh", "武汉一口") if scene.get("lang") == "zh" else config["channel_name"]
     provider = config["images"]["provider"]
     if provider == "placeholder":
         return placeholder_image(scene["caption"], idx, size, out)

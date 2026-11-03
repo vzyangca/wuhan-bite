@@ -42,6 +42,8 @@ def build_body(manifest: dict, config: dict) -> dict:
             "description": description[:4900],
             "tags": manifest.get("tags", []),
             "categoryId": str(s["category_id"]),
+            "defaultLanguage": manifest.get("language", "en"),
+            "defaultAudioLanguage": manifest.get("language", "en"),
         },
         "status": {
             "privacyStatus": s["privacy"],

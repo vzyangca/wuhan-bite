@@ -8,9 +8,12 @@ ROOT = Path(__file__).resolve().parent.parent
 
 DEFAULT_CONFIG = {
     "channel_name": "Wuhan Bites",
+    "channel_name_zh": "武汉一口",
+    "language": "en",
     "video": {"width": 1080, "height": 1920, "fps": 30, "seconds_per_scene": 4},
     "script": {"provider": "template", "model": "claude-sonnet-5-5"},
-    "voice": {"provider": "auto", "voice_name": "en-US-AriaNeural", "say_voice": "Samantha"},
+    "voice": {"provider": "auto", "voice_name": "en-US-AriaNeural", "say_voice": "Samantha",
+              "voice_name_zh": "zh-CN-XiaoxiNeural", "say_voice_zh": "Tingting"},
     "images": {"provider": "auto", "google_model": "imagen-4.0-generate-001"},
     "publish": {"dry_run": True, "platforms": ["youtube_shorts"], "youtube": {}},
 }

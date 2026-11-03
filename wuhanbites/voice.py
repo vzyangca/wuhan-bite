@@ -32,8 +32,15 @@ def _to_wav(src: Path, dst: Path) -> Path:
     return dst
 
 
+def speech_seconds(text: str) -> float:
+    """Rough spoken length: ~4.2 Chinese characters/s, ~2.6 other words/s."""
+    cjk = sum(1 for ch in text if "\u4e00" <= ch <= "\u9fff")
+    rest = "".join(" " if "\u4e00" <= ch <= "\u9fff" else ch for ch in text)
+    return cjk / 4.2 + len(rest.split()) / 2.6
+
+
 def silent_clip(text: str, out: Path) -> Path:
-    seconds = max(MIN_SCENE, len(text.split()) / 2.6 + PAD)
+    seconds = max(MIN_SCENE, speech_seconds(text) + PAD)
     _run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", f"{seconds:.2f}", str(out)])
     return out
 
@@ -59,10 +66,11 @@ def say_clip(text: str, voice: str, out: Path) -> Path:
 
 def _synth(provider: str, text: str, config: dict, raw: Path) -> Path:
     v = config["voice"]
+    zh = config.get("language") == "zh"
     if provider == "edge-tts":
-        return edge_tts_clip(text, v["voice_name"], raw.with_suffix(".mp3"))
+        return edge_tts_clip(text, v["voice_name_zh"] if zh else v["voice_name"], raw.with_suffix(".mp3"))
     if provider == "macos-say":
-        return say_clip(text, v.get("say_voice", ""), raw.with_suffix(".aiff"))
+        return say_clip(text, v.get("say_voice_zh", "Tingting") if zh else v.get("say_voice", ""), raw.with_suffix(".aiff"))
     return silent_clip(text, raw.with_suffix(".wav"))
 
 

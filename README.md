@@ -43,6 +43,18 @@ Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.mp3` (or `.w
 - Scenes live in `topics/*.yaml`: `narration`, `caption` and `visual` (`skyline lanterns bowl pocket ring pot lotus wok follow`). Add a topic by copying one.
 - The images are original illustrations, not photos. Say so if a platform asks whether content is AI-generated or illustrated.
 
+## Mandarin version
+
+```bash
+python3 -m wuhanbites.pipeline run --topic re-gan-mian --lang zh     # output/re-gan-mian-zh/
+```
+
+- Uses the `narration_zh` / `caption_zh` / `title_zh` fields in `topics/*.yaml`, a Mandarin voice (`voice.voice_name_zh`, default `zh-CN-XiaoxiNeural`; male: `zh-CN-YunxiNeural`; macOS fallback `Tingting`) and Chinese subtitles (drawn with Noto Sans CJK, Hiragino Sans GB or PingFang).
+- The upload gets a Chinese title, description and tags, and YouTube's language set to `zh-CN`.
+- Set `language: zh` in `config.yaml` to make it the default.
+- Have a native speaker review the Chinese text before publishing. There is no Wuhan-dialect voice; the voice speaks standard Mandarin.
+- If the macOS voice is missing, download "Tingting" in System Settings -> Accessibility -> Spoken Content -> System Voice -> Manage Voices.
+
 ## Photo scenes with Google
 
 Set a key and run as usual; every scene's `image_prompt` in `topics/*.yaml` becomes a photo:
