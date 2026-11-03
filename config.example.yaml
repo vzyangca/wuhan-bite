@@ -1,0 +1,18 @@
+channel_name: Wuhan Bites
+language: en
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  seconds_per_scene: 4
+script:
+  provider: template        # template | anthropic
+  model: claude-sonnet-5-5
+voice:
+  provider: silent          # silent | edge-tts
+  voice_name: en-US-AriaNeural
+images:
+  provider: placeholder     # placeholder (add your own provider in images.py)
+publish:
+  dry_run: true
+  platforms: [tiktok, youtube_shorts, instagram_reels]

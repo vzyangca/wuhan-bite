@@ -1,0 +1,25 @@
+# Facts here are the only source the offline script generator uses.
+# Verify before publishing.
+topics:
+  - slug: re-gan-mian
+    title: Re Gan Mian (Hot Dry Noodles)
+    hook: "If you only eat one breakfast in Wuhan, make it this."
+    facts:
+      - "Re gan mian is the signature breakfast noodle of Wuhan."
+      - "Alkaline noodles are blanched, tossed in sesame paste, soy sauce and pickles."
+      - "It is eaten dry, not in broth, and is often paired with egg drink."
+    call_to_action: "Follow for more Wuhan street food."
+  - slug: doupi
+    title: Doupi (Tofu-Skin Pocket)
+    hook: "Crispy outside, sticky and savory inside."
+    facts:
+      - "Doupi is a thin bean-curd skin wrapped around sticky rice and fillings."
+      - "It is pan-fried until golden and often sold for breakfast."
+    call_to_action: "Which filling would you try?"
+  - slug: mian-wo
+    title: Mian Wo (Wuhan Doughnut)
+    hook: "The round Wuhan doughnut with a savory twist."
+    facts:
+      - "Mian wo is a fried, ring-shaped snack made from rice and soybean batter."
+      - "It is crisp outside and soft inside, usually eaten fresh from the fryer."
+    call_to_action: "Comment your favorite street snack."
