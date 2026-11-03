@@ -64,6 +64,21 @@ def _font(size: int, cjk: bool = False):
 NO_LINE_START = set("，。！？、；：）》」』”’…—")
 
 
+def _contain_on_blur(img: Image.Image, size: tuple[int, int]) -> Image.Image:
+    """Show the whole photo, centered, over a blurred and darkened enlargement of itself."""
+    from PIL import ImageEnhance, ImageFilter
+
+    w, h = size
+    bg = _cover(img, (w, h)).filter(ImageFilter.GaussianBlur(w / 28))
+    bg = ImageEnhance.Brightness(bg).enhance(0.62)
+    scale = w / img.width
+    fg = img.resize((w, max(1, round(img.height * scale))), Image.LANCZOS)
+    if fg.height > h:  # very tall photo: fall back to cropping
+        return _cover(img, (w, h))
+    bg.paste(fg, (0, (h - fg.height) // 2))
+    return bg
+
+
 def _cover(img: Image.Image, size: tuple[int, int]) -> Image.Image:
     """Resize and center-crop to exactly `size` (no stretching)."""
     w, h = size
@@ -76,13 +91,14 @@ def _cover(img: Image.Image, size: tuple[int, int]) -> Image.Image:
 class Canvas:
     """Draws in logical 1080x1920 units, supersampled for smooth edges."""
 
-    def __init__(self, size: tuple[int, int], gradient, ss: int = 2, photo: Image.Image | None = None):
+    def __init__(self, size: tuple[int, int], gradient, ss: int = 2, photo: Image.Image | None = None, fit: str = "cover"):
         self.size, self.ss = size, ss
         self.k = size[0] / LW * ss
         w, h = round(size[0] * ss), round(size[1] * ss)
         top, bottom = gradient
         if photo is not None:
-            self.img = _cover(photo.convert("RGB"), (w, h))
+            place = _contain_on_blur if fit == "contain" else _cover
+            self.img = place(photo.convert("RGB"), (w, h))
         else:
             grad = Image.linear_gradient("L").resize((w, h))
             self.img = Image.composite(Image.new("RGB", (w, h), bottom), Image.new("RGB", (w, h), top), grad)
@@ -400,8 +416,10 @@ def illustrated_image(scene: dict, idx: int, size: tuple[int, int], out: Path, c
     return out
 
 
-def photo_image(scene: dict, photo: Image.Image, size: tuple[int, int], out: Path, channel: str = "Wuhan Bites") -> Path:
-    c = Canvas(size, GRADIENTS[0], photo=photo)
+def photo_image(scene: dict, photo: Image.Image, size: tuple[int, int], out: Path, channel: str = "Wuhan Bites",
+                fit: str = "cover") -> Path:
+    """fit="cover" crops the photo to 9:16; fit="contain" shows all of it on a blurred background."""
+    c = Canvas(size, GRADIENTS[0], photo=photo, fit=fit)
     c.lang = scene.get("lang", "en")
     _overlay(c, scene, channel, scrim=True)
     c.finish().save(out)

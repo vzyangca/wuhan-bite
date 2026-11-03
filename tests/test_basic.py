@@ -269,3 +269,15 @@ def test_zh_manifest_and_youtube_language():
     assert m["language"] == "zh-CN" and m["title"].startswith("热干面")
     body = build_body(m, config)
     assert body["snippet"]["defaultAudioLanguage"] == "zh-CN"
+
+
+def test_photo_fit_modes(tmp_path):
+    from PIL import Image
+    from wuhanbites.images import photo_image
+
+    wide = Image.new("RGB", (400, 300), (30, 160, 60))  # landscape photo
+    scene = {"caption": "A", "narration": "b"}
+    for fit in ("cover", "contain"):
+        assert Image.open(photo_image(scene, wide, (270, 480), tmp_path / f"{fit}.png", fit=fit)).size == (270, 480)
+    contain = Image.open(tmp_path / "contain.png").convert("RGB")
+    assert contain.getpixel((135, 240))[1] > 120  # whole photo visible in the middle
