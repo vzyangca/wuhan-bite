@@ -40,16 +40,28 @@ def _font(size: int):
     return ImageFont.load_default()
 
 
+def _cover(img: Image.Image, size: tuple[int, int]) -> Image.Image:
+    """Resize and center-crop to exactly `size` (no stretching)."""
+    w, h = size
+    scale = max(w / img.width, h / img.height)
+    img = img.resize((max(w, round(img.width * scale)), max(h, round(img.height * scale))), Image.LANCZOS)
+    left, top = (img.width - w) // 2, (img.height - h) // 2
+    return img.crop((left, top, left + w, top + h))
+
+
 class Canvas:
     """Draws in logical 1080x1920 units, supersampled for smooth edges."""
 
-    def __init__(self, size: tuple[int, int], gradient, ss: int = 2):
+    def __init__(self, size: tuple[int, int], gradient, ss: int = 2, photo: Image.Image | None = None):
         self.size, self.ss = size, ss
         self.k = size[0] / LW * ss
         w, h = round(size[0] * ss), round(size[1] * ss)
         top, bottom = gradient
-        grad = Image.linear_gradient("L").resize((w, h))
-        self.img = Image.composite(Image.new("RGB", (w, h), bottom), Image.new("RGB", (w, h), top), grad)
+        if photo is not None:
+            self.img = _cover(photo.convert("RGB"), (w, h))
+        else:
+            grad = Image.linear_gradient("L").resize((w, h))
+            self.img = Image.composite(Image.new("RGB", (w, h), bottom), Image.new("RGB", (w, h), top), grad)
         self.d = ImageDraw.Draw(self.img, "RGBA")
         self.bottom = bottom
 
@@ -303,11 +315,17 @@ ART = {
 
 
 # ---- composition ---------------------------------------------------------------------
-def illustrated_image(scene: dict, idx: int, size: tuple[int, int], out: Path, channel: str = "Wuhan Bites") -> Path:
-    c = Canvas(size, GRADIENTS[idx % len(GRADIENTS)])
-    for x, y, r in ((120, 380, 180), (960, 1500, 260), (900, 260, 110)):  # soft background shapes
-        c.ell((x - r, y - r, x + r, y + r), (255, 255, 255, 22))
-    ART.get(scene.get("visual"), art_lanterns)(c)
+def _overlay(c: Canvas, scene: dict, channel: str, scrim: bool = False) -> None:
+    """Channel badge, headline and subtitle, shared by illustrated and photo scenes."""
+    if scrim:  # smooth dark gradients at top and bottom keep text readable on busy photos
+        w = c.img.width
+        for y0, y1, flip, peak in ((0, 520, True, 0.62), (1220, LH, False, 0.62)):
+            hh = round((y1 - y0) * c.k)
+            mask = Image.linear_gradient("L").resize((w, hh))
+            if flip:
+                mask = mask.transpose(Image.FLIP_TOP_BOTTOM)
+            mask = mask.point(lambda v: int(255 * peak * (v / 255) ** 1.4))
+            c.img.paste(Image.new("RGB", (w, hh), (0, 0, 0)), (0, round(y0 * c.k)), mask)
     c.rect((60, 70, 60 + 24 * len(channel) + 90, 150), (0, 0, 0, 90), r=40)
     c.text((60 + (24 * len(channel) + 90) / 2, 110), channel, 40, fill=(255, 240, 210), shadow=False)
     size = 100
@@ -317,11 +335,25 @@ def illustrated_image(scene: dict, idx: int, size: tuple[int, int], out: Path, c
         head = c.wrap(scene["caption"], size, 920)
     c.text((LW / 2, 290), head, size)
     sub = c.wrap(scene["narration"], 54, 860)
-    lines = sub.count("\n") + 1
-    h = lines * 74 + 70
+    h = (sub.count("\n") + 1) * 74 + 70
     top = 1390
-    c.rect((90, top, LW - 90, top + h), (0, 0, 0, 120), r=40)
+    c.rect((90, top, LW - 90, top + h), (0, 0, 0, 130), r=40)
     c.text((LW / 2, top + h / 2), sub, 54, shadow=False, spacing=12)
+
+
+def illustrated_image(scene: dict, idx: int, size: tuple[int, int], out: Path, channel: str = "Wuhan Bites") -> Path:
+    c = Canvas(size, GRADIENTS[idx % len(GRADIENTS)])
+    for x, y, r in ((120, 380, 180), (960, 1500, 260), (900, 260, 110)):  # soft background shapes
+        c.ell((x - r, y - r, x + r, y + r), (255, 255, 255, 22))
+    ART.get(scene.get("visual"), art_lanterns)(c)
+    _overlay(c, scene, channel)
+    c.finish().save(out)
+    return out
+
+
+def photo_image(scene: dict, photo: Image.Image, size: tuple[int, int], out: Path, channel: str = "Wuhan Bites") -> Path:
+    c = Canvas(size, GRADIENTS[0], photo=photo)
+    _overlay(c, scene, channel, scrim=True)
     c.finish().save(out)
     return out
 
@@ -336,12 +368,47 @@ def placeholder_image(caption: str, idx: int, size: tuple[int, int], out: Path) 
     return out
 
 
+def _cached_photo(prompt: str, config: dict) -> Image.Image:
+    """Generate (or reuse) a photo for this prompt. Cached so repeat runs cost nothing."""
+    import hashlib
+
+    from .common import ROOT
+    from .image_providers import DEFAULT_MODELS, STYLE, generate
+
+    model = config["images"].get("google_model") or DEFAULT_MODELS["google"]
+    key = hashlib.sha1(f"{model}|{STYLE}|{prompt}".encode()).hexdigest()[:16]
+    path = ROOT / "cache" / "images" / f"{key}.png"
+    if path.exists():
+        return Image.open(path).convert("RGB")
+    img = generate("google", prompt, model)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(path)
+    return img
+
+
+def _wants_photos(config: dict) -> bool:
+    from .image_providers import api_key
+
+    provider = config["images"]["provider"]
+    if provider == "google":
+        return True
+    return provider == "auto" and bool(api_key("google"))
+
+
 def generate_image(scene: dict, idx: int, config: dict, out: Path) -> Path:
-    """Add a branch here for a real image-generation API; write a file to `out`, return it."""
+    """Photos from Google when asked for (or `auto` with a key); otherwise, or on any failure,
+    the local illustrated scene. Add other providers here: write a file to `out`, return it."""
     size = (config["video"]["width"], config["video"]["height"])
-    if config["images"]["provider"] == "placeholder":
+    channel = config["channel_name"]
+    provider = config["images"]["provider"]
+    if provider == "placeholder":
         return placeholder_image(scene["caption"], idx, size, out)
-    return illustrated_image(scene, idx, size, out, config["channel_name"])
+    if scene.get("image_prompt") and _wants_photos(config):
+        try:
+            return photo_image(scene, _cached_photo(scene["image_prompt"], config), size, out, channel)
+        except Exception as e:  # noqa: BLE001 - never lose a video over one image
+            print(f"images: scene {idx} photo failed ({str(e)[:120]}); using illustration")
+    return illustrated_image(scene, idx, size, out, channel)
 
 
 def generate_images(script: dict, config: dict, out_dir: Path) -> list[Path]:

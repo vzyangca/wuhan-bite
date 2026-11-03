@@ -8,3 +8,4 @@ config.yaml
 secrets/
 client_secret*.json
 *token*.json
+cache/

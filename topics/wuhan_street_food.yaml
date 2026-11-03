@@ -1,5 +1,6 @@
 # `scenes` drive the video. Each scene: narration (spoken, also shown as subtitle),
 # caption (headline), visual (one of: skyline lanterns bowl pocket ring pot lotus wok follow).
+# image_prompt: used by the photo providers (images.provider: google). No text or faces in prompts.
 # Verify every food claim before publishing; the generator does not fact-check.
 topics:
   - slug: re-gan-mian
@@ -11,12 +12,12 @@ topics:
       - "Alkaline noodles are boiled ahead, tossed in oil to cool, then dipped in hot water when ordered."
       - "Topped with sesame paste, soy sauce, pickles and scallions; eaten dry, not in broth."
     scenes:
-      - {visual: bowl, caption: "Hot Dry Noodles", narration: "If you only eat one breakfast in Wuhan, make it this."}
-      - {visual: skyline, caption: "Wuhan's Signature Breakfast", narration: "Meet re gan mian, which means hot dry noodles. It is the signature breakfast of Wuhan."}
-      - {visual: wok, caption: "Cooked Ahead", narration: "The noodles are boiled ahead, tossed in oil to cool, then dipped in hot water again when you order."}
-      - {visual: bowl, caption: "Sesame, Soy, Pickles", narration: "Then comes the topping: sesame paste, soy sauce, pickled vegetables and fresh scallions."}
-      - {visual: lanterns, caption: "No Broth Needed", narration: "It is eaten dry, with no broth, and locals often pair it with a warm drink."}
-      - {visual: follow, caption: "Wuhan Bites", narration: "Follow for more Wuhan street food."}
+      - {visual: bowl, caption: "Hot Dry Noodles", narration: "If you only eat one breakfast in Wuhan, make it this.", image_prompt: "A steaming bowl of Wuhan re gan mian hot dry noodles with sesame paste, scallions and pickled radish on a street-stall table, morning light"}
+      - {visual: skyline, caption: "Wuhan's Signature Breakfast", narration: "Meet re gan mian, which means hot dry noodles. It is the signature breakfast of Wuhan.", image_prompt: "Yellow Crane Tower in Wuhan at golden hour beside the Yangtze River, soft haze, warm sunrise sky"}
+      - {visual: wok, caption: "Cooked Ahead", narration: "The noodles are boiled ahead, tossed in oil to cool, then dipped in hot water again when you order.", image_prompt: "Hands tossing blanched alkaline noodles in a metal strainer over a steaming pot at a Wuhan breakfast stall, steam rising"}
+      - {visual: bowl, caption: "Sesame, Soy, Pickles", narration: "Then comes the topping: sesame paste, soy sauce, pickled vegetables and fresh scallions.", image_prompt: "Close-up of re gan mian noodles glossy with sesame sauce, chopped scallions, pickled vegetables and chili oil in a ceramic bowl"}
+      - {visual: lanterns, caption: "No Broth Needed", narration: "It is eaten dry, with no broth, and locals often pair it with a warm drink.", image_prompt: "A Wuhan breakfast street scene with red paper lanterns, a stall counter with bowls of noodles and a cup of warm soy milk, early morning"}
+      - {visual: follow, caption: "Wuhan Bites", narration: "Follow for more Wuhan street food.", image_prompt: "A bowl of re gan mian on a wooden table with chopsticks lifting noodles, steam and warm bokeh lights of a night market behind"}
   - slug: doupi
     title: Doupi (Sticky Rice Pocket)
     hook: "Crispy outside, sticky and savory inside."
@@ -26,12 +27,12 @@ topics:
       - "Sticky rice with pork, mushrooms and dried tofu is spread on the skin, then pan-fried."
       - "It is cut into squares and sold hot, mostly for breakfast."
     scenes:
-      - {visual: pocket, caption: "Doupi", narration: "Crispy outside, sticky and savory inside."}
-      - {visual: skyline, caption: "A Wuhan Classic", narration: "Doupi is a Wuhan breakfast classic, a thin golden skin wrapped around sticky rice."}
-      - {visual: wok, caption: "Griddle Made", narration: "The skin is made from a batter, spread thin on a big hot griddle."}
-      - {visual: pocket, caption: "Packed With Flavor", narration: "Sticky rice goes on top with pork, mushrooms and dried tofu, then it is pan-fried until golden."}
-      - {visual: lanterns, caption: "Hot From The Stall", narration: "It is cut into squares and sold hot at street stalls, mostly for breakfast."}
-      - {visual: follow, caption: "Wuhan Bites", narration: "Which filling would you try?"}
+      - {visual: pocket, caption: "Doupi", narration: "Crispy outside, sticky and savory inside.", image_prompt: "Golden crispy Wuhan doupi square cut open showing sticky rice, pork and mushrooms, on a paper-lined tray at a breakfast stall"}
+      - {visual: skyline, caption: "A Wuhan Classic", narration: "Doupi is a Wuhan breakfast classic, a thin golden skin wrapped around sticky rice.", image_prompt: "Yellow Crane Tower in Wuhan at golden hour beside the Yangtze River, warm light, light haze"}
+      - {visual: wok, caption: "Griddle Made", narration: "The skin is made from a batter, spread thin on a big hot griddle.", image_prompt: "A large round flat griddle with a thin golden batter skin being spread by a stall cook, hot pan, steam, Wuhan breakfast stall"}
+      - {visual: pocket, caption: "Packed With Flavor", narration: "Sticky rice goes on top with pork, mushrooms and dried tofu, then it is pan-fried until golden.", image_prompt: "Cross-section of doupi: crisp golden skin on top and bottom with glutinous rice, diced pork, shiitake mushrooms and dried tofu inside"}
+      - {visual: lanterns, caption: "Hot From The Stall", narration: "It is cut into squares and sold hot at street stalls, mostly for breakfast.", image_prompt: "Squares of golden doupi stacked on a tray at a busy Wuhan street-food stall, red lanterns and steam in the background, morning"}
+      - {visual: follow, caption: "Wuhan Bites", narration: "Which filling would you try?", image_prompt: "Hand holding a piece of golden doupi with steam rising, shallow depth of field, Wuhan street background"}
   - slug: mian-wo
     title: Mian Wo (Wuhan Doughnut)
     hook: "The round Wuhan doughnut with a savory twist."
@@ -41,12 +42,12 @@ topics:
       - "The batter is mixed with scallions and sesame, and fried in a small round ladle."
       - "Crisp outside, soft inside, usually eaten fresh from the fryer."
     scenes:
-      - {visual: ring, caption: "Mian Wo", narration: "The round Wuhan doughnut with a savory twist."}
-      - {visual: skyline, caption: "From Wuhan", narration: "Mian wo is a fried snack from Wuhan, shaped like a little ring with a thin middle."}
-      - {visual: wok, caption: "Rice And Soybean Batter", narration: "The batter is made from rice and soybeans, mixed with scallions and sesame."}
-      - {visual: ring, caption: "Fried In A Ladle", narration: "It is poured into a small round ladle and fried in hot oil until the edge turns crisp."}
-      - {visual: lanterns, caption: "Eat It Hot", narration: "Crisp outside, soft inside, and best eaten fresh from the fryer."}
-      - {visual: follow, caption: "Wuhan Bites", narration: "Comment your favorite street snack."}
+      - {visual: ring, caption: "Mian Wo", narration: "The round Wuhan doughnut with a savory twist.", image_prompt: "Golden ring-shaped Wuhan mian wo fried snacks with scallion and sesame on a paper-lined tray, street stall background"}
+      - {visual: skyline, caption: "From Wuhan", narration: "Mian wo is a fried snack from Wuhan, shaped like a little ring with a thin middle.", image_prompt: "Yellow Crane Tower in Wuhan at golden hour beside the Yangtze River, warm light, light haze"}
+      - {visual: wok, caption: "Rice And Soybean Batter", narration: "The batter is made from rice and soybeans, mixed with scallions and sesame.", image_prompt: "A bowl of pale rice and soybean batter with chopped scallions and sesame seeds beside a hot fryer, Wuhan street stall"}
+      - {visual: ring, caption: "Fried In A Ladle", narration: "It is poured into a small round ladle and fried in hot oil until the edge turns crisp.", image_prompt: "A small round ladle of batter being lowered into hot bubbling oil in a wok, mian wo frying, golden crisp edges forming"}
+      - {visual: lanterns, caption: "Eat It Hot", narration: "Crisp outside, soft inside, and best eaten fresh from the fryer.", image_prompt: "Freshly fried mian wo ring lifted from the oil with a strainer, glistening, steam rising, warm morning light"}
+      - {visual: follow, caption: "Wuhan Bites", narration: "Comment your favorite street snack.", image_prompt: "Several golden mian wo rings in a paper bag held in a hand, Wuhan street scene softly blurred behind"}
   - slug: lotus-pork-rib-soup
     title: Lotus Root and Pork Rib Soup
     hook: "The comfort soup Wuhan is famous for."
@@ -56,9 +57,9 @@ topics:
       - "The lotus root turns soft and starchy; the broth becomes rich and mellow."
       - "Lotus root slices have a pattern of small holes."
     scenes:
-      - {visual: pot, caption: "Lotus Root Soup", narration: "The comfort soup Wuhan is famous for."}
-      - {visual: skyline, caption: "City Of Lakes", narration: "Wuhan is a city of lakes, and lotus grows across Hubei province."}
-      - {visual: pot, caption: "Slow Simmered", narration: "Chunks of lotus root and pork ribs are simmered slowly in a clay pot for a couple of hours."}
-      - {visual: lotus, caption: "Soft And Starchy", narration: "The lotus root turns soft and starchy, and the broth becomes rich and mellow."}
-      - {visual: lotus, caption: "Look For The Holes", narration: "Every slice has tiny holes, and that is how you know it is lotus root."}
-      - {visual: follow, caption: "Wuhan Bites", narration: "Follow for more Wuhan food."}
+      - {visual: pot, caption: "Lotus Root Soup", narration: "The comfort soup Wuhan is famous for.", image_prompt: "A rustic clay pot of Wuhan lotus root and pork rib soup, steam rising, wooden table, warm cozy light"}
+      - {visual: skyline, caption: "City Of Lakes", narration: "Wuhan is a city of lakes, and lotus grows across Hubei province.", image_prompt: "Wuhan East Lake at sunrise with a field of lotus leaves in the mist, soft golden light"}
+      - {visual: pot, caption: "Slow Simmered", narration: "Chunks of lotus root and pork ribs are simmered slowly in a clay pot for a couple of hours.", image_prompt: "Chunks of lotus root and pork ribs simmering in a clay pot on a stove, gentle steam, kitchen background"}
+      - {visual: lotus, caption: "Soft And Starchy", narration: "The lotus root turns soft and starchy, and the broth becomes rich and mellow.", image_prompt: "Thick slices of cooked lotus root showing their holes, in a bowl of rich milky broth with a pork rib, close-up"}
+      - {visual: lotus, caption: "Look For The Holes", narration: "Every slice has tiny holes, and that is how you know it is lotus root.", image_prompt: "Close-up of a cut lotus root showing its pattern of small holes on a wooden board, fresh and glistening"}
+      - {visual: follow, caption: "Wuhan Bites", narration: "Follow for more Wuhan food.", image_prompt: "A steaming bowl of lotus root pork rib soup with a spoon on a wooden table, warm bokeh lights behind"}

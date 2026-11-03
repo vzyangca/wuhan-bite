@@ -29,7 +29,7 @@ Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.mp3` (or `.w
 | Stage | Module | Offline default | Real provider |
 |---|---|---|---|
 | Script | `script_gen.py` | Scenes from `topics/*.yaml` | Anthropic API (`ANTHROPIC_API_KEY`) |
-| Images | `images.py` | Original flat illustrations drawn with Pillow, plus headline and subtitle | Plug an image-generation API into `generate_image()` |
+| Images | `images.py` | Original flat illustrations drawn with Pillow | Google Imagen photos when `GEMINI_API_KEY` is set (`images.provider: auto`), with headline and subtitle drawn on top |
 | Voice | `voice.py` | `auto`: edge-tts (internet), else macOS `say`, else silent | One clip per scene, so scene length follows the narration |
 | Assemble | `assemble.py` | ffmpeg, 9:16, slow zoom, timed to narration | - |
 | Publish | `publish.py` | Dry run, writes manifest | Add platform uploaders |
@@ -42,6 +42,23 @@ Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.mp3` (or `.w
 - If you copied `config.example.yaml` earlier, copy it again (or set `voice.provider: auto` and `images.provider: illustrated`) to pick up the new defaults.
 - Scenes live in `topics/*.yaml`: `narration`, `caption` and `visual` (`skyline lanterns bowl pocket ring pot lotus wok follow`). Add a topic by copying one.
 - The images are original illustrations, not photos. Say so if a platform asks whether content is AI-generated or illustrated.
+
+## Photo scenes with Google
+
+Set a key and run as usual; every scene's `image_prompt` in `topics/*.yaml` becomes a photo:
+
+```bash
+export GEMINI_API_KEY=your_key        # Google AI Studio; Imagen needs billing enabled
+python3 -m wuhanbites.pipeline run --topic re-gan-mian
+```
+
+- `images.provider: auto` (default) uses photos when the key exists, otherwise the local illustrations.
+  Use `google` to require photos, `illustrated` to never call the API.
+- A scene whose photo fails (quota, network, bad key) falls back to its illustration and prints a warning.
+- Photos are cached in `cache/images/` (git-ignored), so re-running a topic costs nothing; edit an `image_prompt` to get a new image.
+- Cheaper model: `images.google_model: imagen-4.0-fast-generate-001`.
+- Text (headline, subtitle) is drawn by this code, not by the image model.
+- AI-generated photos are not real photos of the dish. Disclose this to the platform (the uploader already sends the flag) and do not present them as documentary footage.
 
 ## Comparing image providers
 

@@ -13,7 +13,8 @@ voice:
   voice_name: en-US-AriaNeural   # edge-tts voice
   say_voice: Samantha            # macOS `say` voice (see: say -v '?')
 images:
-  provider: illustrated     # illustrated | placeholder
+  provider: auto            # auto (Google photos if GEMINI_API_KEY is set, else illustrations) | google | illustrated | placeholder
+  google_model: imagen-4.0-generate-001   # e.g. imagen-4.0-fast-generate-001 (cheaper)
 publish:
   dry_run: true
   platforms: [youtube_shorts]   # tiktok, instagram_reels: no uploader yet

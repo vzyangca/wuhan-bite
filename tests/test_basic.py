@@ -163,3 +163,53 @@ def test_missing_key_message(monkeypatch):
     monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
     with pytest.raises(RuntimeError, match="GEMINI_API_KEY"):
         ip.generate("google", "x")
+
+
+def test_photo_scene_has_overlay_and_correct_size(tmp_path):
+    from PIL import Image
+    from wuhanbites.images import photo_image
+
+    photo = Image.new("RGB", (1024, 1536), (200, 120, 60))
+    scene = {"caption": "Hot Dry Noodles", "narration": "If you only eat one breakfast in Wuhan, make it this."}
+    p = photo_image(scene, photo, (270, 480), tmp_path / "p.png")
+    img = Image.open(p)
+    assert img.size == (270, 480)
+    assert img.getpixel((135, 360)) != (200, 120, 60)  # subtitle box drawn over the photo
+
+
+def test_photo_provider_caches_and_falls_back(tmp_path, monkeypatch):
+    from PIL import Image
+    from wuhanbites import image_providers, images
+
+    calls = []
+
+    def fake_generate(provider, prompt, model=None):
+        calls.append(prompt)
+        return Image.new("RGB", (576, 1024), "orange")
+
+    monkeypatch.setattr(image_providers, "generate", fake_generate)
+    monkeypatch.setattr("wuhanbites.common.ROOT", tmp_path)
+    monkeypatch.setenv("GEMINI_API_KEY", "x")
+    config = load_config()
+    config["video"].update(width=180, height=320)
+    scene = {"caption": "A", "narration": "b", "visual": "bowl", "image_prompt": "a bowl of noodles"}
+    images.generate_image(scene, 0, config, tmp_path / "a.png")
+    images.generate_image(scene, 1, config, tmp_path / "b.png")
+    assert len(calls) == 1  # second run served from cache
+
+    def boom(*a, **k):
+        raise RuntimeError("quota")
+
+    monkeypatch.setattr(image_providers, "generate", boom)
+    scene2 = dict(scene, image_prompt="something new")
+    out = images.generate_image(scene2, 2, config, tmp_path / "c.png")  # falls back to illustration
+    assert out.exists()
+
+
+def test_auto_without_key_uses_illustrations(tmp_path, monkeypatch):
+    from wuhanbites import images
+
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    config = load_config()
+    assert images._wants_photos(config) is False

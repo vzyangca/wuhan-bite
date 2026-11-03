@@ -11,7 +11,7 @@ DEFAULT_CONFIG = {
     "video": {"width": 1080, "height": 1920, "fps": 30, "seconds_per_scene": 4},
     "script": {"provider": "template", "model": "claude-sonnet-5-5"},
     "voice": {"provider": "auto", "voice_name": "en-US-AriaNeural", "say_voice": "Samantha"},
-    "images": {"provider": "illustrated"},
+    "images": {"provider": "auto", "google_model": "imagen-4.0-generate-001"},
     "publish": {"dry_run": True, "platforms": ["youtube_shorts"], "youtube": {}},
 }
 
