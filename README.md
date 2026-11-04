@@ -43,6 +43,19 @@ Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.mp3` (or `.w
 - Scenes live in `topics/*.yaml`: `narration`, `caption` and `visual` (`skyline lanterns bowl pocket ring pot lotus wok follow`). Add a topic by copying one.
 - The images are original illustrations, not photos. Say so if a platform asks whether content is AI-generated or illustrated.
 
+## Using your own photos
+
+Put a picture in `assets/` (git-ignored, so it stays on your computer) and point a scene at it in `topics/*.yaml`:
+
+```yaml
+- {visual: bowl, photo: tomato-egg-noodles.jpg, fit: contain, caption: "...", narration: "..."}
+```
+
+`fit: contain` shows the whole photo on a blurred background (best for small or landscape photos); `fit: cover` crops it to 9:16.
+If the file is missing, the scene falls back to a generated or illustrated image. The `tomato-egg-noodles` topic is an example:
+copy your photo to `assets/tomato-egg-noodles.jpg` and run `python3 -m wuhanbites.pipeline run --topic tomato-egg-noodles`.
+Only use photos you own or have permission to use.
+
 ## Mandarin version
 
 ```bash

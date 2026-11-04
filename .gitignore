@@ -9,3 +9,4 @@ secrets/
 client_secret*.json
 *token*.json
 cache/
+assets/

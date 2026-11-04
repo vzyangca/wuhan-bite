@@ -14,6 +14,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
+from .common import ROOT
+
 LW, LH = 1080, 1920  # logical canvas; everything is drawn in these units
 VISUALS = ("skyline", "lanterns", "bowl", "pocket", "ring", "pot", "lotus", "wok", "follow")
 GRADIENTS = [
@@ -471,6 +473,15 @@ def generate_image(scene: dict, idx: int, config: dict, out: Path) -> Path:
     provider = config["images"]["provider"]
     if provider == "placeholder":
         return placeholder_image(scene["caption"], idx, size, out)
+    if scene.get("photo"):  # your own picture
+        path = Path(scene["photo"])
+        path = path if path.is_absolute() else ROOT / "assets" / path
+        if path.exists():
+            from PIL import ImageOps
+
+            photo = ImageOps.exif_transpose(Image.open(path)).convert("RGB")
+            return photo_image(scene, photo, size, out, channel, fit=scene.get("fit", "contain"))
+        print(f"images: scene {idx} photo not found at {path}; using a generated or illustrated image")
     if scene.get("image_prompt") and _wants_photos(config):
         try:
             return photo_image(scene, _cached_photo(scene["image_prompt"], config), size, out, channel)

@@ -281,3 +281,22 @@ def test_photo_fit_modes(tmp_path):
         assert Image.open(photo_image(scene, wide, (270, 480), tmp_path / f"{fit}.png", fit=fit)).size == (270, 480)
     contain = Image.open(tmp_path / "contain.png").convert("RGB")
     assert contain.getpixel((135, 240))[1] > 120  # whole photo visible in the middle
+
+
+def test_scene_uses_local_photo_and_falls_back_when_missing(tmp_path, monkeypatch):
+    from PIL import Image
+    from wuhanbites import images
+
+    (tmp_path / "assets").mkdir()
+    Image.new("RGB", (300, 340), (20, 200, 40)).save(tmp_path / "assets" / "mine.jpg")
+    monkeypatch.setattr(images, "ROOT", tmp_path)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    config = load_config()
+    config["video"].update(width=180, height=320)
+    scene = {"caption": "A", "narration": "b", "visual": "bowl", "photo": "mine.jpg"}
+    out = images.generate_image(scene, 0, config, tmp_path / "a.png")
+    assert Image.open(out).convert("RGB").getpixel((90, 160))[1] > 150   # green photo in the middle
+    missing = dict(scene, photo="nope.jpg")
+    out2 = images.generate_image(missing, 0, config, tmp_path / "b.png")  # illustration instead of crashing
+    assert out2.exists()

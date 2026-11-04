@@ -68,3 +68,16 @@ topics:
       - {visual: lotus, caption: "Soft And Starchy", narration: "The lotus root turns soft and starchy, and the broth becomes rich and mellow.", image_prompt: "Thick slices of cooked lotus root showing their holes, in a bowl of rich milky broth with a pork rib, close-up", caption_zh: "又粉又糯", narration_zh: "藕炖得又粉又糯，汤汁也变得浓郁醇厚。"}
       - {visual: lotus, caption: "Look For The Holes", narration: "Every slice has tiny holes, and that is how you know it is lotus root.", image_prompt: "Close-up of a cut lotus root showing its pattern of small holes on a wooden board, fresh and glistening", caption_zh: "认准小孔", narration_zh: "每一片藕都有小孔，这就是莲藕的样子。"}
       - {visual: follow, caption: "Wuhan Bites", narration: "Follow for more Wuhan food.", image_prompt: "A steaming bowl of lotus root pork rib soup with a spoon on a wooden table, warm bokeh lights behind", caption_zh: "武汉一口", narration_zh: "关注我，看更多武汉美食。"}
+  - slug: tomato-egg-noodles
+    title: Tomato and Egg Noodles
+    title_zh: 番茄鸡蛋面
+    hook: "Tomato and egg is a classic home-style pairing in Chinese cooking."
+    call_to_action: "What would you add to your bowl?"
+    facts:
+      - "Tomato and scrambled egg is a classic home-style pairing in Chinese cooking."
+      - "The bowl shows noodles with scrambled egg, tomato and leafy greens."
+    # `photo` = your own picture, looked up in assets/ (git-ignored) or an absolute path; fit: contain | cover.
+    scenes:
+      - {visual: bowl, photo: tomato-egg-noodles.jpg, fit: contain, caption: "Tomato Egg Noodles", narration: "Tomato and egg is a classic home-style pairing in Chinese cooking.", caption_zh: "番茄鸡蛋面", narration_zh: "番茄炒蛋，是中国家常菜里的经典搭配。", image_prompt: "A white bowl of noodles with tomato and scrambled egg sauce and leafy greens on a dark table, home-cooked, warm light"}
+      - {visual: bowl, photo: tomato-egg-noodles.jpg, fit: contain, caption: "Egg, Tomato, Greens", narration: "Soft scrambled egg and juicy tomato make a bright sauce for the noodles.", caption_zh: "鸡蛋、番茄、青菜", narration_zh: "嫩滑的鸡蛋和多汁的番茄，做成鲜亮的汤汁拌面。", image_prompt: "Close-up of soft scrambled egg and ripe tomato sauce over noodles with bok choy, steam, warm light"}
+      - {visual: follow, caption: "Wuhan Bites", narration: "What would you add to your bowl?", caption_zh: "武汉一口", narration_zh: "你会往碗里再加什么？"}
