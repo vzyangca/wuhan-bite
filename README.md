@@ -115,12 +115,12 @@ Keys are read from the environment only; never put them in `config.yaml` or comm
 ## Finance ledger
 
 ```bash
-python -m wuhanbites.finance add --kind cost --amount 4.50 --note "image credits"
-python -m wuhanbites.finance add --kind income --amount 12.00 --note "creator fund" --platform tiktok
-python -m wuhanbites.finance summary
+python3 -m wuhanbites.finance add --kind cost --amount 4.50 --note "image credits"
+python3 -m wuhanbites.finance add --kind income --amount 12.00 --note "creator fund" --platform tiktok
+python3 -m wuhanbites.finance summary
 ```
 
-Data is stored in `data/ledger.csv`.
+Data is stored in `data/ledger.csv` on your computer. The `data/` folder is git-ignored, so your numbers are not pushed to GitHub.
 
 ## Publishing to YouTube Shorts
 
