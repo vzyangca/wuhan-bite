@@ -17,7 +17,7 @@ voice:
   say_voice_zh: Tingting         # macOS Mandarin voice; may need downloading in System Settings
 images:
   provider: auto            # auto (Google photos if GEMINI_API_KEY is set, else illustrations) | google | illustrated | placeholder
-  google_model: imagen-4.0-generate-001   # e.g. imagen-4.0-fast-generate-001 (cheaper)
+  google_model: auto        # auto = pick an image model your key can use; or name one (see: python3 -m wuhanbites.image_providers)
 publish:
   dry_run: true
   platforms: [youtube_shorts]   # tiktok, instagram_reels: no uploader yet

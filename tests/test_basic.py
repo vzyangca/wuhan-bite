@@ -146,6 +146,9 @@ def test_providers_parse_responses(monkeypatch):
         return {"predictions": [{"bytesBase64Encoded": b64}]} if "googleapis" in url else {"data": [{"b64_json": b64}]}
 
     monkeypatch.setattr(ip, "_post", fake_post)
+    monkeypatch.setattr(ip, "_get", lambda url, headers: {"models": [
+        {"name": "models/imagen-4.0-generate-001", "supportedGenerationMethods": ["predict"]}]})
+    ip._picked.clear()
     monkeypatch.setenv("GEMINI_API_KEY", "g")
     monkeypatch.setenv("OPENAI_API_KEY", "o")
     for provider in ("google", "openai"):
@@ -323,3 +326,42 @@ def test_google_http_error_is_readable_and_stops_retries(tmp_path, monkeypatch, 
     assert len(outs) == 3 and all(o.exists() for o in outs)  # video still builds with illustrations
     assert "FAILED_PRECONDITION" in text and "billed users" in text
     assert text.count("rejected") == 1  # reported once, not once per scene
+
+
+def test_google_model_auto_pick_and_gemini_image_path(monkeypatch):
+    import base64, io
+    from PIL import Image
+    from wuhanbites import image_providers as ip
+
+    models = {"models": [
+        {"name": "models/gemini-2.5-pro", "supportedGenerationMethods": ["generateContent"]},
+        {"name": "models/imagen-4.0-generate-001", "supportedGenerationMethods": ["embed"]},      # not predict-capable
+        {"name": "models/gemini-2.5-flash-image", "supportedGenerationMethods": ["generateContent"]},
+    ]}
+    monkeypatch.setattr(ip, "_get", lambda url, headers: models)
+    ip._picked.clear()
+    assert ip.pick_google_model("k") == "gemini-2.5-flash-image"
+
+    buf = io.BytesIO()
+    Image.new("RGB", (1024, 1024), "blue").save(buf, "PNG")
+    b64 = base64.b64encode(buf.getvalue()).decode()
+    seen = {}
+
+    def fake_post(url, body, headers):
+        seen["url"], seen["body"] = url, body
+        return {"candidates": [{"content": {"parts": [{"text": "ok"}, {"inlineData": {"mimeType": "image/png", "data": b64}}]}}]}
+
+    monkeypatch.setattr(ip, "_post", fake_post)
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    w, h = ip.generate("google", "a bowl").size
+    assert abs(w / h - 9 / 16) < 0.01 and seen["url"].endswith("gemini-2.5-flash-image:generateContent")
+    assert seen["body"]["generationConfig"]["responseModalities"] == ["IMAGE"]
+
+
+def test_gemini_no_image_is_an_error(monkeypatch):
+    import pytest
+    from wuhanbites import image_providers as ip
+
+    monkeypatch.setattr(ip, "_post", lambda *a, **k: {"promptFeedback": {"blockReason": "SAFETY"}})
+    with pytest.raises(RuntimeError, match="SAFETY"):
+        ip.generate_google("p", "gemini-2.5-flash-image", "k")

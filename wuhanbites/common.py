@@ -14,7 +14,7 @@ DEFAULT_CONFIG = {
     "script": {"provider": "template", "model": "claude-sonnet-5-5"},
     "voice": {"provider": "auto", "voice_name": "en-US-AriaNeural", "say_voice": "Samantha",
               "voice_name_zh": "zh-CN-XiaoxiNeural", "say_voice_zh": "Tingting"},
-    "images": {"provider": "auto", "google_model": "imagen-4.0-generate-001"},
+    "images": {"provider": "auto", "google_model": "auto"},
     "publish": {"dry_run": True, "platforms": ["youtube_shorts"], "youtube": {}},
 }
 

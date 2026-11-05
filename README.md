@@ -82,7 +82,7 @@ python3 -m wuhanbites.pipeline run --topic re-gan-mian
   Use `google` to require photos, `illustrated` to never call the API.
 - A scene whose photo fails (quota, network, bad key) falls back to its illustration and prints a warning.
 - Photos are cached in `cache/images/` (git-ignored), so re-running a topic costs nothing; edit an `image_prompt` to get a new image.
-- Cheaper model: `images.google_model: imagen-4.0-fast-generate-001`.
+- `images.google_model: auto` asks Google which image model your key can use (Imagen, else a Gemini image model). See the list with `python3 -m wuhanbites.image_providers`, or set a model name yourself.
 - Text (headline, subtitle) is drawn by this code, not by the image model.
 - AI-generated photos are not real photos of the dish. Disclose this to the platform (the uploader already sends the flag) and do not present them as documentary footage.
 
@@ -98,7 +98,7 @@ open output/compare/sheet.png
 ```
 
 It makes the same 3 scenes with each provider that has a key (costs a few cents per image).
-Model names are options: `--google-model imagen-4.0-fast-generate-001`, `--openai-model gpt-image-1-mini`.
+Model names are options: `--google-model <name>` (default `auto`), `--openai-model gpt-image-1-mini`.
 Keys are read from the environment only; never put them in `config.yaml` or commit them.
 
 ## Finance ledger
