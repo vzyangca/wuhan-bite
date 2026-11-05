@@ -365,3 +365,37 @@ def test_gemini_no_image_is_an_error(monkeypatch):
     monkeypatch.setattr(ip, "_post", lambda *a, **k: {"promptFeedback": {"blockReason": "SAFETY"}})
     with pytest.raises(RuntimeError, match="SAFETY"):
         ip.generate_google("p", "gemini-2.5-flash-image", "k")
+
+
+def test_mandarin_default_voice_name_and_rate(monkeypatch):
+    config = load_config()
+    assert config["voice"]["voice_name_zh"] == "zh-CN-XiaoxiaoNeural"
+    assert config["voice"]["rate"] == "+0%"
+
+
+def test_tts_override_and_rate_reach_the_voice(tmp_path, monkeypatch):
+    import shutil
+    import subprocess
+    import pytest
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    from wuhanbites import voice
+    from wuhanbites.script_gen import localize
+
+    topic = {"slug": "t", "title": "T", "scenes": [
+        {"visual": "bowl", "caption": "c", "narration": "n", "caption_zh": "热干面", "narration_zh": "热干面好吃", "tts_zh": "re4 gan1 mian4 hao3 chi1"}]}
+    scene = localize(topic, "zh")["scenes"][0]
+    assert scene["narration"] == "热干面好吃" and scene["tts"].startswith("re4")
+    seen = {}
+
+    def fake(text, name, out, rate="+0%"):
+        seen.update(text=text, name=name, rate=rate)
+        subprocess.run(["ffmpeg", "-y", "-f", "lavfi", "-i", "sine=frequency=300:duration=1", str(out)], check=True, capture_output=True)
+        return out
+
+    monkeypatch.setattr(voice, "edge_tts_clip", fake)
+    config = load_config()
+    config.update(language="zh")
+    config["voice"].update(provider="edge-tts", rate="+10%")
+    voice.generate_voice({"scenes": [scene]}, config, tmp_path / "voice")
+    assert seen == {"text": "re4 gan1 mian4 hao3 chi1", "name": "zh-CN-XiaoxiaoNeural", "rate": "+10%"}

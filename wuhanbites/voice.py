@@ -45,12 +45,12 @@ def silent_clip(text: str, out: Path) -> Path:
     return out
 
 
-def edge_tts_clip(text: str, voice_name: str, out: Path) -> Path:
+def edge_tts_clip(text: str, voice_name: str, out: Path, rate: str = "+0%") -> Path:
     import asyncio
 
     import edge_tts  # optional dependency; needs internet
 
-    asyncio.run(edge_tts.Communicate(text, voice_name).save(str(out)))
+    asyncio.run(edge_tts.Communicate(text, voice_name, rate=rate).save(str(out)))
     if not out.exists() or out.stat().st_size == 0:
         raise RuntimeError("edge-tts produced no audio")
     return out
@@ -68,7 +68,8 @@ def _synth(provider: str, text: str, config: dict, raw: Path) -> Path:
     v = config["voice"]
     zh = config.get("language") == "zh"
     if provider == "edge-tts":
-        return edge_tts_clip(text, v["voice_name_zh"] if zh else v["voice_name"], raw.with_suffix(".mp3"))
+        return edge_tts_clip(text, v["voice_name_zh"] if zh else v["voice_name"], raw.with_suffix(".mp3"),
+                             v.get("rate", "+0%"))
     if provider == "macos-say":
         return say_clip(text, v.get("say_voice_zh", "Tingting") if zh else v.get("say_voice", ""), raw.with_suffix(".aiff"))
     return silent_clip(text, raw.with_suffix(".wav"))
@@ -88,7 +89,8 @@ def generate_voice(script: dict, config: dict, out_base: Path) -> tuple[Path, li
         try:
             wavs = []
             for i, scene in enumerate(script["scenes"]):
-                raw = _synth(provider, scene["narration"], config, parts / f"scene_{i:02d}_raw")
+                spoken = scene.get("tts") or scene["narration"]  # `tts_zh` in the topic can respell a hard word
+                raw = _synth(provider, spoken, config, parts / f"scene_{i:02d}_raw")
                 wavs.append(_to_wav(raw, parts / f"scene_{i:02d}.wav"))
             used = provider
             break
@@ -104,3 +106,42 @@ def generate_voice(script: dict, config: dict, out_base: Path) -> tuple[Path, li
     out = out_base.with_suffix(".wav")
     _run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", str(out)])
     return out, durations
+
+
+MANDARIN_VOICES = ["zh-CN-XiaoxiaoNeural", "zh-CN-XiaoyiNeural", "zh-CN-YunxiNeural", "zh-CN-YunyangNeural", "zh-CN-YunjianNeural"]
+
+
+def _main() -> None:
+    """python3 -m wuhanbites.voice list | audition"""
+    import argparse
+    import asyncio
+
+    import edge_tts
+
+    from .common import ROOT, load_topics
+
+    ap = argparse.ArgumentParser(prog="wuhanbites.voice")
+    ap.add_argument("cmd", choices=["list", "audition"], help="list: Mandarin voices; audition: sample each one")
+    cmd = ap.parse_args().cmd
+    if cmd == "list":
+        voices = asyncio.run(edge_tts.list_voices())
+        for v in voices:
+            if v["Locale"].startswith("zh-"):
+                print(f"{v['ShortName']:28} {v['Gender']:7} {v['Locale']}")
+        return
+    topic = load_topics()["re-gan-mian"]
+    text = "".join(s["narration_zh"] for s in topic["scenes"][:2])
+    out = ROOT / "output" / "voice_samples"
+    out.mkdir(parents=True, exist_ok=True)
+    for name in MANDARIN_VOICES:
+        path = out / f"{name}.mp3"
+        try:
+            edge_tts_clip(text, name, path)
+            print(f"ok      {path}")
+        except Exception as e:  # noqa: BLE001
+            print(f"FAILED  {name}: {str(e)[:100]}")
+    print(f"Listen with: open {out}")
+
+
+if __name__ == "__main__":
+    _main()

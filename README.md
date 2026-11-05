@@ -62,11 +62,22 @@ Only use photos you own or have permission to use.
 python3 -m wuhanbites.pipeline run --topic re-gan-mian --lang zh
 ```
 
-- Uses the `narration_zh` / `caption_zh` / `title_zh` fields in `topics/*.yaml`, a Mandarin voice (`voice.voice_name_zh`, default `zh-CN-XiaoxiNeural`; male: `zh-CN-YunxiNeural`; macOS fallback `Tingting`) and Chinese subtitles (drawn with Noto Sans CJK, Hiragino Sans GB or PingFang).
+- Uses the `narration_zh` / `caption_zh` / `title_zh` fields in `topics/*.yaml`, a Mandarin voice (`voice.voice_name_zh`, default `zh-CN-XiaoxiaoNeural`; male: `zh-CN-YunxiNeural`; macOS fallback `Tingting`) and Chinese subtitles (drawn with Noto Sans CJK, Hiragino Sans GB or PingFang).
 - The upload gets a Chinese title, description and tags, and YouTube's language set to `zh-CN`.
 - Set `language: zh` in `config.yaml` to make it the default.
 - Have a native speaker review the Chinese text before publishing. There is no Wuhan-dialect voice; the voice speaks standard Mandarin.
 - If the macOS voice is missing, download "Tingting" in System Settings -> Accessibility -> Spoken Content -> System Voice -> Manage Voices.
+
+### Choosing and tuning the Mandarin voice
+
+```bash
+python3 -m wuhanbites.voice audition
+open output/voice_samples
+```
+
+This makes a short sample in each of five Mandarin voices so you can pick one by ear. Set your choice in `config.yaml` as `voice.voice_name_zh`
+(for example `zh-CN-YunxiNeural`). `python3 -m wuhanbites.voice list` shows every Chinese voice. Set `voice.rate` (for example `"+10%"`) to speak faster.
+If a word is mispronounced, add a `tts_zh` field to that scene in `topics/*.yaml` with a respelled version for the voice to read; the on-screen text stays unchanged.
 
 ## Photo scenes with Google
 

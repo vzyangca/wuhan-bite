@@ -13,7 +13,7 @@ DEFAULT_CONFIG = {
     "video": {"width": 1080, "height": 1920, "fps": 30, "seconds_per_scene": 4},
     "script": {"provider": "template", "model": "claude-sonnet-5-5"},
     "voice": {"provider": "auto", "voice_name": "en-US-AriaNeural", "say_voice": "Samantha",
-              "voice_name_zh": "zh-CN-XiaoxiNeural", "say_voice_zh": "Tingting"},
+              "rate": "+0%", "voice_name_zh": "zh-CN-XiaoxiaoNeural", "say_voice_zh": "Tingting"},
     "images": {"provider": "auto", "google_model": "auto"},
     "publish": {"dry_run": True, "platforms": ["youtube_shorts"], "youtube": {}},
 }
