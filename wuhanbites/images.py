@@ -456,8 +456,14 @@ def _cached_photo(prompt: str, config: dict) -> Image.Image:
     return img
 
 
+_photos_disabled: str | None = None  # set when Google rejects the key/billing/quota, so we stop retrying
+
+
 def _wants_photos(config: dict) -> bool:
     from .image_providers import api_key
+
+    if _photos_disabled:
+        return False
 
     provider = config["images"]["provider"]
     if provider == "google":
@@ -486,10 +492,19 @@ def generate_image(scene: dict, idx: int, config: dict, out: Path) -> Path:
         try:
             return photo_image(scene, _cached_photo(scene["image_prompt"], config), size, out, channel)
         except Exception as e:  # noqa: BLE001 - never lose a video over one image
-            print(f"images: scene {idx} photo failed ({str(e)[:120]}); using illustration")
+            global _photos_disabled
+            msg = str(e)[:500]
+            if msg.startswith(("HTTP 400", "HTTP 401", "HTTP 403", "HTTP 429")):
+                _photos_disabled = msg  # same key/billing problem would hit every scene
+                print(f"images: Google photos rejected: {msg}\nimages: using illustrations for this run. "
+                      "Fix the key, billing or model name and run again.")
+            else:
+                print(f"images: scene {idx} photo failed ({msg}); using illustration")
     return illustrated_image(scene, idx, size, out, channel)
 
 
 def generate_images(script: dict, config: dict, out_dir: Path) -> list[Path]:
+    global _photos_disabled
+    _photos_disabled = None
     out_dir.mkdir(parents=True, exist_ok=True)
     return [generate_image(s, i, config, out_dir / f"scene_{i:02d}.png") for i, s in enumerate(script["scenes"])]

@@ -14,7 +14,7 @@ run the whole pipeline end to end, then swap in real providers one stage at a ti
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp config.example.yaml config.yaml     # edit later; defaults work offline
+cp config.example.yaml config.yaml
 # ffmpeg must be installed and on PATH (brew install ffmpeg / apt install ffmpeg)
 
 python3 -m wuhanbites.pipeline list-topics
@@ -59,7 +59,7 @@ Only use photos you own or have permission to use.
 ## Mandarin version
 
 ```bash
-python3 -m wuhanbites.pipeline run --topic re-gan-mian --lang zh     # output/re-gan-mian-zh/
+python3 -m wuhanbites.pipeline run --topic re-gan-mian --lang zh
 ```
 
 - Uses the `narration_zh` / `caption_zh` / `title_zh` fields in `topics/*.yaml`, a Mandarin voice (`voice.voice_name_zh`, default `zh-CN-XiaoxiNeural`; male: `zh-CN-YunxiNeural`; macOS fallback `Tingting`) and Chinese subtitles (drawn with Noto Sans CJK, Hiragino Sans GB or PingFang).
@@ -73,10 +73,11 @@ python3 -m wuhanbites.pipeline run --topic re-gan-mian --lang zh     # output/re
 Set a key and run as usual; every scene's `image_prompt` in `topics/*.yaml` becomes a photo:
 
 ```bash
-export GEMINI_API_KEY=your_key        # Google AI Studio; Imagen needs billing enabled
+export GEMINI_API_KEY=your_key
 python3 -m wuhanbites.pipeline run --topic re-gan-mian
 ```
 
+- Get the key from Google AI Studio. Imagen may require billing to be enabled on the Google account; if every scene fails with HTTP 400, the error message printed in the console says why.
 - `images.provider: auto` (default) uses photos when the key exists, otherwise the local illustrations.
   Use `google` to require photos, `illustrated` to never call the API.
 - A scene whose photo fails (quota, network, bad key) falls back to its illustration and prints a warning.
@@ -90,8 +91,8 @@ python3 -m wuhanbites.pipeline run --topic re-gan-mian
 Photo-style scenes need a text-to-image API key (not included). To compare providers side by side:
 
 ```bash
-export GEMINI_API_KEY=...      # Google AI Studio key (Imagen needs billing enabled, as far as I know)
-export OPENAI_API_KEY=...      # OpenAI key; set only one if you want just one provider
+export GEMINI_API_KEY=...
+export OPENAI_API_KEY=...
 python3 -m wuhanbites.compare_images
 open output/compare/sheet.png
 ```
@@ -120,11 +121,11 @@ One-time setup:
 2. APIs & Services -> OAuth consent screen: choose External, add your own Google account as a **test user**.
 3. Credentials -> Create credentials -> **OAuth client ID** -> type **Desktop app** -> download the JSON.
 4. Save it as `secrets/client_secret.json` (the `secrets/` folder is git-ignored; never commit it).
-5. Install and log in:
+5. Install and log in (the login opens a browser and saves `secrets/youtube_token.json`):
 
 ```bash
 pip install -r requirements-youtube.txt
-python3 -m wuhanbites.pipeline auth-youtube      # opens a browser, saves secrets/youtube_token.json
+python3 -m wuhanbites.pipeline auth-youtube
 ```
 
 Upload:
@@ -143,6 +144,7 @@ Notes:
 
 ## Notes
 
+- When pasting commands into a Mac terminal, paste only the command lines (not any `#` comments).
 - Check each platform's policy on AI-generated content and label it as required.
 - Verify food facts in `topics/*.yaml` before publishing; the script generator only uses what is in the topic file.
 - Never commit `config.yaml` or API keys (they are git-ignored).

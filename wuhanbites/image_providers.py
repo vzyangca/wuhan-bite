@@ -50,7 +50,13 @@ def _post(url: str, body: dict, headers: dict) -> dict:
         with urllib.request.urlopen(req, timeout=180) as r:
             return json.load(r)
     except urllib.error.HTTPError as e:
-        raise RuntimeError(f"HTTP {e.code} from {url.split('?')[0]}: {e.read().decode(errors='replace')[:300]}") from None
+        body = e.read().decode(errors="replace")
+        try:  # Google and OpenAI both wrap the reason in {"error": {"message": ...}}
+            err = json.loads(body).get("error", {})
+            msg = f"{err.get('status', '')} {err.get('message', body)}".strip()
+        except (ValueError, AttributeError):
+            msg = body
+        raise RuntimeError(f"HTTP {e.code} {' '.join(msg.split())[:500]}") from None
 
 
 def _decode(b64: str) -> Image.Image:

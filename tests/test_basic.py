@@ -300,3 +300,26 @@ def test_scene_uses_local_photo_and_falls_back_when_missing(tmp_path, monkeypatc
     missing = dict(scene, photo="nope.jpg")
     out2 = images.generate_image(missing, 0, config, tmp_path / "b.png")  # illustration instead of crashing
     assert out2.exists()
+
+
+def test_google_http_error_is_readable_and_stops_retries(tmp_path, monkeypatch, capsys):
+    import io, json, urllib.error
+    from wuhanbites import image_providers, images
+
+    body = json.dumps({"error": {"code": 400, "status": "FAILED_PRECONDITION",
+                                 "message": "Imagen API is only accessible to billed users at this time."}}).encode()
+
+    def fake_urlopen(req, timeout=0):
+        raise urllib.error.HTTPError("u", 400, "Bad Request", {}, io.BytesIO(body))
+
+    monkeypatch.setattr(image_providers.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr("wuhanbites.common.ROOT", tmp_path)
+    monkeypatch.setenv("GEMINI_API_KEY", "x")
+    config = load_config()
+    config["video"].update(width=180, height=320)
+    script = {"scenes": [{"caption": "A", "narration": "b", "visual": "bowl", "image_prompt": f"p{i}"} for i in range(3)]}
+    outs = images.generate_images(script, config, tmp_path / "o")
+    text = capsys.readouterr().out
+    assert len(outs) == 3 and all(o.exists() for o in outs)  # video still builds with illustrations
+    assert "FAILED_PRECONDITION" in text and "billed users" in text
+    assert text.count("rejected") == 1  # reported once, not once per scene
