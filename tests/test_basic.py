@@ -414,3 +414,9 @@ def test_config_validation_names_the_wrong_setting(tmp_path):
     good = tmp_path / "ok.yaml"
     good.write_text("voice:\n  provider: macos-say\nimages:\n  provider: illustrated\nlanguage: zh\n")
     assert load_config(good)["images"]["provider"] == "illustrated"
+
+
+def test_version_label_matches_release_name():
+    import wuhanbites
+
+    assert wuhanbites.__version__ == "wuhan-bite-v-0.1"
