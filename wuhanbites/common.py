@@ -29,11 +29,33 @@ def _merge(base: dict, extra: dict) -> dict:
     return out
 
 
+ALLOWED = {
+    ("language",): {"en", "zh"},
+    ("script", "provider"): {"template", "anthropic"},
+    ("voice", "provider"): {"auto", "edge-tts", "macos-say", "silent"},
+    ("images", "provider"): {"auto", "google", "illustrated", "placeholder"},
+}
+
+
+def validate_config(config: dict) -> dict:
+    """Fail early with a clear message when a setting has a value that does not belong there."""
+    for path, allowed in ALLOWED.items():
+        value = config
+        for key in path:
+            value = value.get(key) if isinstance(value, dict) else None
+        if value not in allowed:
+            raise SystemExit(
+                f"config.yaml: '{'.'.join(path)}' is {value!r}, but must be one of: {', '.join(sorted(allowed))}.\n"
+                f"Open config.yaml and fix that line (look under the '{path[0]}:' heading)."
+            )
+    return config
+
+
 def load_config(path: Path | None = None) -> dict:
     path = path or ROOT / "config.yaml"
     if path.exists():
-        return _merge(DEFAULT_CONFIG, yaml.safe_load(path.read_text()) or {})
-    return dict(DEFAULT_CONFIG)
+        return validate_config(_merge(DEFAULT_CONFIG, yaml.safe_load(path.read_text()) or {}))
+    return validate_config(dict(DEFAULT_CONFIG))
 
 
 def load_topics() -> dict[str, dict]:

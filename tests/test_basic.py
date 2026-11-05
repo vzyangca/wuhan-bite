@@ -399,3 +399,18 @@ def test_tts_override_and_rate_reach_the_voice(tmp_path, monkeypatch):
     config["voice"].update(provider="edge-tts", rate="+10%")
     voice.generate_voice({"scenes": [scene]}, config, tmp_path / "voice")
     assert seen == {"text": "re4 gan1 mian4 hao3 chi1", "name": "zh-CN-XiaoxiaoNeural", "rate": "+10%"}
+
+
+def test_config_validation_names_the_wrong_setting(tmp_path):
+    import pytest
+    from wuhanbites.common import load_config
+
+    bad = tmp_path / "config.yaml"
+    bad.write_text("voice:\n  provider: illustrated\n")  # an images value on the voice line
+    with pytest.raises(SystemExit) as e:
+        load_config(bad)
+    msg = str(e.value)
+    assert "voice.provider" in msg and "illustrated" in msg and "edge-tts" in msg
+    good = tmp_path / "ok.yaml"
+    good.write_text("voice:\n  provider: macos-say\nimages:\n  provider: illustrated\nlanguage: zh\n")
+    assert load_config(good)["images"]["provider"] == "illustrated"
