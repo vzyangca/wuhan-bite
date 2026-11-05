@@ -12,16 +12,16 @@ run the whole pipeline end to end, then swap in real providers one stage at a ti
 ## Quick start
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp config.example.yaml config.yaml     # edit later; defaults work offline
 # ffmpeg must be installed and on PATH (brew install ffmpeg / apt install ffmpeg)
 
-python -m wuhanbites.pipeline list-topics
-python -m wuhanbites.pipeline run --topic re-gan-mian
+python3 -m wuhanbites.pipeline list-topics
+python3 -m wuhanbites.pipeline run --topic re-gan-mian
 ```
 
-Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.mp3` (or `.wav`),
+Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.wav`,
 `video.mp4`, and `publish.json` (the upload manifest).
 
 ## Stages
@@ -41,7 +41,7 @@ Output lands in `output/<topic>/`: `script.json`, `images/`, `voice.mp3` (or `.w
 - Pick a different voice with `voice.voice_name` (edge-tts, e.g. `en-US-GuyNeural`) or `voice.say_voice` (macOS, list with `say -v '?'`).
 - If you copied `config.example.yaml` earlier, copy it again (or set `voice.provider: auto` and `images.provider: illustrated`) to pick up the new defaults.
 - Scenes live in `topics/*.yaml`: `narration`, `caption` and `visual` (`skyline lanterns bowl pocket ring pot lotus wok follow`). Add a topic by copying one.
-- The images are original illustrations, not photos. Say so if a platform asks whether content is AI-generated or illustrated.
+- Image sources: the built-in scenes are original illustrations; Google scenes are AI-generated pictures, not real photos of the dish; your own photos in `assets/` are yours. Disclose AI-generated content as the platform requires (the uploader already sends YouTube's flag), and only use photos you own or are licensed to use.
 
 ## Using your own photos
 
