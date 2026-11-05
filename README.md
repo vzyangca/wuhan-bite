@@ -148,7 +148,7 @@ python3 -m wuhanbites.pipeline run --topic re-gan-mian --upload
 Notes:
 
 - Check `publish.youtube.privacy` in `config.yaml` (`private` by default). Review the video in YouTube Studio, then set it public there.
-- Uploads from API projects that have not passed YouTube's audit are locked to private. Request an audit if you want public API uploads.
+- YouTube has in the past forced uploads from unverified API projects to private until the project passed an audit; Google's current reference page says unverified projects are not restricted. Unconfirmed either way, so do one private test upload first and check the result in YouTube Studio.
 - Each upload costs about 1,600 of the default 10,000 daily quota units.
 - The AI-content disclosure is sent automatically (`containsSyntheticMedia`).
 - TikTok and Instagram Reels have no uploader yet; they are skipped.
