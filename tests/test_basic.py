@@ -420,3 +420,19 @@ def test_version_label_matches_release_name():
     import wuhanbites
 
     assert wuhanbites.__version__ == "wuhan-bite-v-0.1"
+
+
+def test_series_badge_and_sources_flow_to_manifest():
+    from pathlib import Path
+    from wuhanbites.common import load_config
+    from wuhanbites.publish import build_manifest
+    from wuhanbites.script_gen import localize
+
+    topic = load_topics()["bit-story"]
+    for lang in ("en", "zh"):
+        script = localize(topic, lang)
+        assert all(s["badge"] and s["palette"] == "blue" for s in script["scenes"])
+    cfg = load_config()
+    cfg["language"] = "zh"
+    m = build_manifest(topic, localize(topic, "zh"), Path("v.mp4"), cfg)
+    assert "信号简史" in m["title"] and "资料来源" in m["description"] and "信息论" in m["tags"]

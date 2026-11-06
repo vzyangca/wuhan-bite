@@ -17,12 +17,19 @@ from PIL import Image, ImageDraw, ImageFont
 from .common import ROOT
 
 LW, LH = 1080, 1920  # logical canvas; everything is drawn in these units
-VISUALS = ("skyline", "lanterns", "bowl", "pocket", "ring", "pot", "lotus", "wok", "follow")
+VISUALS = ("skyline", "lanterns", "bowl", "pocket", "ring", "pot", "lotus", "wok", "follow",
+           "telegraph", "wave", "bits", "channel", "formula", "timeline")
 GRADIENTS = [
     ((255, 205, 130), (206, 62, 44)),
     ((255, 228, 160), (226, 112, 48)),
     ((250, 190, 120), (150, 40, 50)),
     ((255, 214, 140), (196, 80, 40)),
+]
+BLUE_GRADIENTS = [
+    ((70, 120, 200), (16, 28, 78)),
+    ((60, 150, 190), (14, 40, 84)),
+    ((110, 100, 200), (24, 20, 80)),
+    ((50, 110, 170), (10, 30, 66)),
 ]
 PLACEHOLDER_PALETTE = [(176, 48, 36), (222, 140, 40), (60, 110, 80), (40, 70, 110)]
 FONT_CANDIDATES = [
@@ -107,6 +114,7 @@ class Canvas:
         self.d = ImageDraw.Draw(self.img, "RGBA")
         self.bottom = bottom
         self.lang = "en"
+        self.scene: dict = {}
 
     def _b(self, b):
         return [v * self.k for v in b]
@@ -373,9 +381,127 @@ def art_follow(c, cx=540, cy=980):
     c.text((cx, cy + 325), "+  关注" if c.lang == "zh" else "+  Follow", 78, fill="white", shadow=False)
 
 
+# ---- info-theory visuals -------------------------------------------------------------
+INK = (255, 244, 220)
+GOLD = (255, 200, 80)
+
+
+def art_telegraph(c, cx=540, cy=980):
+    for x in (170, 540, 910):  # poles and crossarms
+        c.rect((x - 12, cy - 330, x + 12, cy + 330), (40, 28, 24), r=6)
+        c.rect((x - 90, cy - 300, x + 90, cy - 276), (40, 28, 24), r=8)
+    for dy in (-290, -250):
+        pts = [(x, cy + dy + 60 * math.sin((x - 170) / 740 * math.pi * 2 * 2) * 0.5 + 34) for x in range(120, 961, 20)]
+        c.line(pts, (255, 244, 220, 190), 5)
+    x = 110  # Morse dots and dashes
+    for ch in (1, 0, 1, 1, 0, 0, 1, 0):
+        w = 30 if ch == 0 else 96
+        c.rect((x, cy + 90, x + w, cy + 124), GOLD, r=17)
+        x += w + 28
+    c.rect((300, cy + 250, 780, cy + 290), (60, 40, 30), r=14)  # telegraph key
+    c.rect((330, cy + 190, 750, cy + 232), (214, 160, 70), r=14)
+    c.ell((720, cy + 150, 800, cy + 232), (40, 28, 24))
+
+
+def art_wave(c, cx=540, cy=980):
+    c.line([(100, cy), (980, cy)], (255, 255, 255, 110), 4)
+    amp, per = 230, 440
+    pts = [(x, cy - amp * math.sin((x - 100) / per * 2 * math.pi)) for x in range(100, 981, 6)]
+    c.line(pts, GOLD, 10)
+    n = 12
+    for i in range(n + 1):
+        x = 100 + i * (880 / n)
+        y = cy - amp * math.sin((x - 100) / per * 2 * math.pi)
+        c.line([(x, cy), (x, y)], (255, 255, 255, 190), 5)
+        c.ell((x - 17, y - 17, x + 17, y + 17), (255, 255, 255))
+    c.text((cx, cy + 380), "采样" if c.lang == "zh" else "sampling", 64, fill=INK)
+
+
+def art_bits(c, cx=540, cy=980):
+    rng = random.Random(7)
+    cols, rows, cell = 6, 7, 120
+    x0, y0 = cx - cols * cell / 2, cy - rows * cell / 2 - 20
+    c.rect((x0 - 30, y0 - 30, x0 + cols * cell + 30, y0 + rows * cell + 30), (0, 0, 0, 90), r=40)
+    for r in range(rows):
+        for k in range(cols):
+            bit = rng.randint(0, 1)
+            c.text((x0 + k * cell + cell / 2, y0 + r * cell + cell / 2), str(bit), 84,
+                   fill=GOLD if bit else (190, 210, 255), shadow=False)
+
+
+def art_channel(c, cx=540, cy=980):
+    zh = c.lang == "zh"
+    labels = (["信息源", "发送器", "信道", "接收器", "目的地"] if zh else
+              ["Source", "Transmitter", "Channel", "Receiver", "Destination"])
+    top, h, gap = cy - 430, 120, 55
+    for i, name in enumerate(labels):
+        y = top + i * (h + gap)
+        c.rect((cx - 230, y, cx + 230, y + h), (255, 255, 255, 235) if i != 2 else (255, 214, 120, 245), r=30)
+        c.text((cx, y + h / 2), name, 56, fill=(24, 36, 84), shadow=False)
+        if i < 4:
+            ay = y + h
+            c.line([(cx, ay + 6), (cx, ay + gap - 14)], INK, 8)
+            c.poly([(cx - 20, ay + gap - 22), (cx + 20, ay + gap - 22), (cx, ay + gap - 2)], INK)
+    ny = top + 2 * (h + gap) + h / 2  # noise feeding the channel
+    c.line([(cx + 232, ny), (cx + 300, ny)], (255, 120, 110), 8)
+    pts = [(cx + 310 + t, ny + (28 if (t // 18) % 2 else -28)) for t in range(0, 190, 18)]
+    c.line(pts, (255, 120, 110), 7)
+    c.text((cx + 410, ny - 70), "噪声" if zh else "noise", 46, fill=(255, 150, 140), shadow=False)
+
+
+def _fit_text(c, cx, cy, s, size, max_w, fill=INK):
+    while c.text_width(s, size) > max_w and size > 40:
+        size -= 4
+    c.text((cx, cy), s, size, fill=fill, shadow=False)
+
+
+def _formula_parts(f):
+    """Split on the subscript two so it can be drawn small and low (some fonts lack the glyph)."""
+    parts = []
+    for i, chunk in enumerate(f.split("\u2082")):
+        if i:
+            parts.append(("2", True))
+        if chunk:
+            parts.append((chunk, False))
+    return parts
+
+
+def art_formula(c, cx=540, cy=980):
+    f = c.scene.get("formula", "C = B log2(1 + S/N)")
+    c.rect((70, cy - 260, LW - 70, cy + 260), (0, 0, 0, 90), r=60)
+    parts = _formula_parts(f)
+    size = 120
+    while size > 40 and sum(c.text_width(t, round(size * (0.6 if sub else 1))) for t, sub in parts) > 880:
+        size -= 4
+    x = cx - sum(c.text_width(t, round(size * (0.6 if sub else 1))) for t, sub in parts) / 2
+    for t, sub in parts:
+        sz = round(size * (0.6 if sub else 1))
+        w = c.text_width(t, sz)
+        c.text((x, cy - 20 + (size * 0.28 if sub else 0)), t, sz, fill=GOLD, anchor="lm", shadow=False)
+        x += w
+    note = c.scene.get("formula_note_zh" if c.lang == "zh" else "formula_note", "")
+    if note:
+        _fit_text(c, cx, cy + 150, note, 50, 860, fill=INK)
+
+
+def art_timeline(c, cx=540, cy=980):
+    years = c.scene.get("years") or ["1924", "1928", "1948"]
+    n = len(years)
+    top, bottom = cy - 330, cy + 280
+    c.line([(300, top), (300, bottom)], (255, 255, 255, 170), 10)
+    for i, label in enumerate(years):
+        y = top + i * (bottom - top) / max(1, n - 1)
+        c.ell((300 - 34, y - 34, 300 + 34, y + 34), GOLD)
+        year, _, rest = str(label).partition(" ")
+        c.text((200, y), year, 64, fill=INK, anchor="rm", shadow=False)
+        c.text((360, y), rest, 56, fill=INK, anchor="lm", shadow=False)
+
+
 ART = {
     "skyline": art_skyline, "lanterns": art_lanterns, "bowl": art_bowl, "pocket": art_pocket,
     "ring": art_ring, "pot": art_pot, "lotus": art_lotus, "wok": art_wok, "follow": art_follow,
+    "telegraph": art_telegraph, "wave": art_wave, "bits": art_bits, "channel": art_channel,
+    "formula": art_formula, "timeline": art_timeline,
 }
 
 
@@ -408,8 +534,10 @@ def _overlay(c: Canvas, scene: dict, channel: str, scrim: bool = False) -> None:
 
 
 def illustrated_image(scene: dict, idx: int, size: tuple[int, int], out: Path, channel: str = "Wuhan Bites") -> Path:
-    c = Canvas(size, GRADIENTS[idx % len(GRADIENTS)])
+    grads = BLUE_GRADIENTS if scene.get("palette") == "blue" else GRADIENTS
+    c = Canvas(size, grads[idx % len(grads)])
     c.lang = scene.get("lang", "en")
+    c.scene = scene
     for x, y, r in ((120, 380, 180), (960, 1500, 260), (900, 260, 110)):  # soft background shapes
         c.ell((x - r, y - r, x + r, y + r), (255, 255, 255, 22))
     ART.get(scene.get("visual"), art_lanterns)(c)
@@ -423,6 +551,7 @@ def photo_image(scene: dict, photo: Image.Image, size: tuple[int, int], out: Pat
     """fit="cover" crops the photo to 9:16; fit="contain" shows all of it on a blurred background."""
     c = Canvas(size, GRADIENTS[0], photo=photo, fit=fit)
     c.lang = scene.get("lang", "en")
+    c.scene = scene
     _overlay(c, scene, channel, scrim=True)
     c.finish().save(out)
     return out
@@ -475,7 +604,8 @@ def generate_image(scene: dict, idx: int, config: dict, out: Path) -> Path:
     """Photos from Google when asked for (or `auto` with a key); otherwise, or on any failure,
     the local illustrated scene. Add other providers here: write a file to `out`, return it."""
     size = (config["video"]["width"], config["video"]["height"])
-    channel = config.get("channel_name_zh", "武汉一口") if scene.get("lang") == "zh" else config["channel_name"]
+    channel = scene.get("badge") or (config.get("channel_name_zh", "武汉一口") if scene.get("lang") == "zh"
+                                     else config["channel_name"])
     provider = config["images"]["provider"]
     if provider == "placeholder":
         return placeholder_image(scene["caption"], idx, size, out)

@@ -13,9 +13,16 @@ def localize(topic: dict, lang: str) -> dict:
             if not (s.get("narration_zh") and s.get("caption_zh")):
                 raise SystemExit(f"Topic '{topic['slug']}' has no Mandarin text (narration_zh / caption_zh).")
             s["narration"], s["caption"] = s["narration_zh"], s["caption_zh"]
+            if s.get("years_zh"):
+                s["years"] = s["years_zh"]
             if s.get("tts_zh"):
                 s["tts"] = s["tts_zh"]  # what the voice reads, if it needs a respelling
         s["lang"] = lang
+        badge = topic.get("series_zh") if lang == "zh" else topic.get("series")
+        if badge:
+            s["badge"] = badge
+        if topic.get("palette"):
+            s.setdefault("palette", topic["palette"])
         scenes.append(s)
     return {"title": topic.get("title_zh", topic["title"]) if lang == "zh" else topic["title"], "scenes": scenes}
 

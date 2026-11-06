@@ -1,0 +1,127 @@
+# History of information theory: Nyquist (1924, 1928), Hartley (1928), Shannon (1948).
+# Facts checked against: Wikipedia "History of information theory", Britannica "Harry Nyquist",
+# historyofinformation.com entries on the sampling theorem and Shannon's 1948 paper, COMSOL's sampling-theorem history.
+# Items marked VERIFY in comments below were not confirmed from a fetched source; check them before publishing.
+# *_zh fields: Mandarin version (use --lang zh). Have a native speaker review before publishing.
+# Visuals: telegraph wave bits channel formula timeline follow. `formula` / `years` feed those visuals.
+topics:
+  - slug: bit-story
+    title: Who Invented the Bit?
+    title_zh: 谁发明了比特？
+    series: Signal Stories
+    series_zh: 信号简史
+    palette: blue
+    hook: "Every message you send is made of bits. Who figured out how to measure information?"
+    call_to_action: "Follow for more stories from the history of science."
+    tags: [informationtheory, shannon, nyquist, hartley, historyofscience, shorts]
+    tags_zh: [信息论, 香农, 奈奎斯特, 哈特利, 科学史, shorts]
+    sources:
+      - "Wikipedia: History of information theory"
+      - "Shannon, A Mathematical Theory of Communication, Bell System Technical Journal, 1948"
+    facts:
+      - "Nyquist (1924), Hartley (1928) and Shannon (1948) built the theory step by step."
+    scenes:
+      - {visual: bits, caption: "Who Invented the Bit?", narration: "Every message you send is made of bits. Who figured out how to measure information?", caption_zh: "谁发明了比特？", narration_zh: "你发出的每一条消息，都由比特组成。是谁想出了衡量信息的方法？"}
+      - {visual: timeline, years: ["1924 Nyquist", "1928 Hartley", "1948 Shannon"], caption: "Three Engineers", narration: "The answer is a relay of three engineers: Nyquist in 1924, Hartley in 1928, and Shannon in 1948.", caption_zh: "三位工程师", narration_zh: "答案是三位工程师的接力：1924年奈奎斯特，1928年哈特利，1948年香农。", years_zh: ["1924 奈奎斯特", "1928 哈特利", "1948 香农"]}
+      - {visual: telegraph, caption: "1924: Telegraph Speed", narration: "In 1924, Harry Nyquist studied how fast a telegraph can send, and how that depends on the number of distinguishable signal levels.", caption_zh: "1924：电报速度", narration_zh: "1924年，奈奎斯特研究电报能发多快，以及速度和可区分信号电平数量之间的关系。"}
+      - {visual: wave, caption: "1928: Nyquist's Limit", narration: "In 1928 he showed that a channel with bandwidth B can carry at most two B independent pulses per second.", caption_zh: "奈奎斯特极限", narration_zh: "1928年他证明，带宽为B的信道，每秒最多传送两倍B个独立脉冲。"}
+      - {visual: formula, formula: "H = n log s", formula_note: "Hartley, 1928", formula_note_zh: "哈特利，1928", caption: "1928: Hartley's Measure", narration: "The same year, Ralph Hartley proposed measuring information by counting the possible sequences of symbols, setting aside what a message means.", caption_zh: "哈特利的度量", narration_zh: "同一年，哈特利提出用可能的符号序列数来度量信息，而不去管消息的含义。"}
+      - {visual: channel, caption: "1948: Shannon", narration: "In 1948 Claude Shannon unified these ideas in A Mathematical Theory of Communication, and added noise, entropy and the bit.", caption_zh: "1948：香农", narration_zh: "1948年，香农在《通信的数学理论》中把这些想法统一起来，并加入了噪声、熵和比特。"}
+      - {visual: formula, formula: "C = B log₂(1 + S/N)", formula_note: "Channel capacity", formula_note_zh: "信道容量", caption: "A Hard Limit", narration: "His result: every noisy channel has a capacity, a limit that no coding trick can beat.", caption_zh: "不可逾越的上限", narration_zh: "他的结论是：每条有噪声的信道都有一个容量，任何编码技巧都无法超越它。"}
+      - {visual: follow, caption: "Signal Stories", narration: "Follow for more stories from the history of science.", caption_zh: "信号简史", narration_zh: "关注我，看更多科学史故事。"}
+
+  - slug: nyquist-limit
+    title: Nyquist and the Sampling Limit
+    title_zh: 奈奎斯特与采样极限
+    series: Signal Stories
+    series_zh: 信号简史
+    palette: blue
+    hook: "Why does digital audio need at least two samples per cycle?"
+    call_to_action: "Follow for more stories from the history of science."
+    tags: [nyquist, samplingtheorem, informationtheory, historyofscience, shorts]
+    tags_zh: [奈奎斯特, 采样定理, 信息论, 科学史, shorts]
+    sources:
+      - "Britannica: Harry Nyquist"
+      - "historyofinformation.com: The Nyquist-Shannon Sampling Theorem"
+      - "COMSOL blog: The Origin Story of the Sampling Theorem and Vladimir Kotelnikov"
+    facts:
+      - "Nyquist, born in Sweden in 1889, joined AT&T in 1917."
+    scenes:
+      - {visual: wave, caption: "Two Samples Per Cycle", narration: "Why does digital audio need at least two samples per cycle?", caption_zh: "每周期两个采样点", narration_zh: "为什么数字音频每个周期至少需要两个采样点？"}
+      - {visual: timeline, years: ["1889 Born in Sweden", "1907 Moves to the US", "1917 Joins AT&T", "1934 Bell Labs"], caption: "Harry Nyquist", narration: "Harry Nyquist was born in Sweden in 1889, moved to the United States in 1907, and joined AT&T in 1917 after a Yale physics PhD.", caption_zh: "哈里·奈奎斯特", narration_zh: "奈奎斯特1889年生于瑞典，1907年移居美国，在耶鲁获物理学博士学位后，于1917年加入AT&T。", years_zh: ["1889 生于瑞典", "1907 移居美国", "1917 加入AT&T", "1934 贝尔实验室"]}
+      - {visual: telegraph, caption: "A Telegraph Problem", narration: "His questions were practical: how fast can a telegraph line carry a message?", caption_zh: "电报的难题", narration_zh: "他的问题很实际：一条电报线路，最快能传多快的消息？"}
+      - {visual: wave, caption: "2B Pulses a Second", narration: "In his 1928 paper, he showed that a bandwidth of B can carry up to two B independent pulses per second.", caption_zh: "每秒2B个脉冲", narration_zh: "在1928年的论文里，他证明带宽B最多能传每秒两倍B个独立脉冲。"}
+      - {visual: timeline, years: ["1915 Whittaker", "1928 Nyquist", "1933 Kotelnikov", "1949 Shannon"], caption: "Many Names", narration: "Others reached related results: Whittaker in 1915, Kotelnikov in 1933, and Shannon wrote the theorem out explicitly in 1949.", caption_zh: "不止一个名字", narration_zh: "还有人得到相关结果：惠特克1915年，科捷利尼科夫1933年，香农在1949年把定理明确写了出来。", years_zh: ["1915 惠特克", "1928 奈奎斯特", "1933 科捷利尼科夫", "1949 香农"]}
+      - {visual: formula, formula: "fs ≥ 2B", formula_note: "Sample at least twice the top frequency", formula_note_zh: "采样率至少是最高频率的两倍", caption: "The Rule", narration: "The rule: sample at least twice the highest frequency in the signal, and you can reconstruct it.", caption_zh: "规则", narration_zh: "规则是：采样率至少是信号最高频率的两倍，就能还原信号。"}
+      - {visual: follow, caption: "Signal Stories", narration: "Follow for more stories from the history of science.", caption_zh: "信号简史", narration_zh: "关注我，看更多科学史故事。"}
+
+  - slug: hartley-measure
+    title: Hartley Measures Information
+    title_zh: 哈特利度量信息
+    series: Signal Stories
+    series_zh: 信号简史
+    palette: blue
+    hook: "Can information be measured without knowing what a message means?"
+    call_to_action: "Follow for more stories from the history of science."
+    tags: [hartley, informationtheory, historyofscience, shorts]
+    tags_zh: [哈特利, 信息论, 科学史, shorts]
+    sources:
+      - "Hartley, Transmission of Information, 1928"
+      - "Wikipedia: History of information theory"
+    facts:
+      - "Hartley treated information as measurable and separate from meaning."
+    scenes:
+      - {visual: bits, caption: "Measuring Information", narration: "Can information be measured without knowing what a message means?", caption_zh: "能度量信息吗", narration_zh: "不知道消息的含义，能度量信息吗？"}
+      - {visual: telegraph, caption: "Ralph Hartley, 1928", narration: "In 1928, engineer Ralph Hartley said yes, in his paper Transmission of Information.", caption_zh: "拉尔夫·哈特利，1928", narration_zh: "1928年，工程师哈特利在论文《信息的传输》中给出了肯定的回答。"}
+      - {visual: bits, caption: "Count the Possibilities", narration: "His idea: information is the number of different symbol sequences a sender could choose from, not their meaning.", caption_zh: "数一数可能性", narration_zh: "他的想法是：信息取决于发送者可选的符号序列有多少种，而不是它们的含义。"}
+      - {visual: formula, formula: "H = n log s", formula_note: "n symbols, s choices each", formula_note_zh: "n个符号，每个有s种选择", caption: "Hartley's Formula", narration: "A message of n symbols, each chosen from s possibilities, has a measure proportional to n times the logarithm of s.", caption_zh: "哈特利公式", narration_zh: "n个符号，每个从s种可能中选取，其信息量与n乘以s的对数成正比。"}
+      - {visual: channel, caption: "A Bridge to Shannon", narration: "Shannon later credited this line of work, and the unit of information was named the hartley in his honor.", caption_zh: "通向香农", narration_zh: "香农后来承认了这条思路，信息的单位也以哈特利命名。"}
+      - {visual: follow, caption: "Signal Stories", narration: "Follow for more stories from the history of science.", caption_zh: "信号简史", narration_zh: "关注我，看更多科学史故事。"}
+
+  - slug: shannon-1948
+    title: Shannon's 1948 Paper
+    title_zh: 香农的1948年论文
+    series: Signal Stories
+    series_zh: 信号简史
+    palette: blue
+    hook: "One paper in 1948 founded the science of information."
+    call_to_action: "Follow for more stories from the history of science."
+    tags: [shannon, informationtheory, bit, historyofscience, shorts]
+    tags_zh: [香农, 信息论, 比特, 科学史, shorts]
+    sources:
+      - "Shannon, A Mathematical Theory of Communication, Bell System Technical Journal 27, July and October 1948"
+      - "Wikipedia: A Mathematical Theory of Communication"
+      - "historyofinformation.com: Shannon's A Mathematical Theory of Communication"
+    facts:
+      - "Published in two parts, July and October 1948."
+    scenes:
+      - {visual: channel, caption: "One Paper, 1948", narration: "One paper in 1948 founded the science of information.", caption_zh: "1948年的一篇论文", narration_zh: "1948年的一篇论文，创立了信息科学。"}
+      - {visual: timeline, years: ["1948 July Part one", "1948 October Part two"], caption: "Two Parts", narration: "Claude Shannon published A Mathematical Theory of Communication in the Bell System Technical Journal, in July and October 1948.", caption_zh: "分两期发表", narration_zh: "香农的《通信的数学理论》分两期发表在《贝尔系统技术杂志》上，时间是1948年7月和10月。", years_zh: ["1948年7月 上篇", "1948年10月 下篇"]}
+      - {visual: channel, caption: "A Model of Communication", narration: "He described every system with five parts: a source, a transmitter, a channel, a receiver and a destination.", caption_zh: "通信模型", narration_zh: "他把所有通信系统分成五个部分：信息源、发送器、信道、接收器和目的地。"}
+      - {visual: bits, caption: "The Word Bit", narration: "The paper introduced the bit as the unit of information, a word he credited to John Tukey, who shortened binary digit.", caption_zh: "比特一词", narration_zh: "论文把比特作为信息的单位，这个词他归功于约翰·图基，他把二进制数字缩短成了比特。"}
+      - {visual: formula, formula: "C = B log₂(1 + S/N)", formula_note: "Capacity of a noisy channel", formula_note_zh: "有噪声信道的容量", caption: "Channel Capacity", narration: "Its deepest result: below the channel capacity, errors can be made as small as you like.", caption_zh: "信道容量", narration_zh: "最深刻的结论是：只要速率低于信道容量，就可以把错误率降到任意小。"}
+      - {visual: telegraph, caption: "A Book in 1949", narration: "In 1949 it was republished as a book, with an overview by Warren Weaver for general readers.", caption_zh: "1949年成书", narration_zh: "1949年它以书的形式再版，并附有沃伦·韦弗写给普通读者的概述。"}
+      - {visual: follow, caption: "Signal Stories", narration: "Follow for more stories from the history of science.", caption_zh: "信号简史", narration_zh: "关注我，看更多科学史故事。"}
+
+  - slug: shannon-hartley
+    title: The Shannon-Hartley Limit
+    title_zh: 香农-哈特利极限
+    series: Signal Stories
+    series_zh: 信号简史
+    palette: blue
+    hook: "Why can't your Wi-Fi be infinitely fast?"
+    call_to_action: "Follow for more stories from the history of science."
+    tags: [shannonhartley, channelcapacity, informationtheory, shorts]
+    tags_zh: [香农哈特利, 信道容量, 信息论, shorts]
+    sources:
+      - "Wikipedia: History of information theory"
+      - "Shannon, A Mathematical Theory of Communication, 1948"
+    facts:
+      - "Capacity depends on bandwidth and signal-to-noise ratio."
+    scenes:
+      - {visual: wave, caption: "Why Not Infinite?", narration: "Why can't your Wi-Fi be infinitely fast?", caption_zh: "为什么不能无限快", narration_zh: "为什么你的无线网络不能无限快？"}
+      - {visual: formula, formula: "C = B log₂(1 + S/N)", formula_note: "The Shannon-Hartley law", formula_note_zh: "香农-哈特利定律", caption: "One Formula", narration: "Because of one formula: the Shannon-Hartley law for the capacity of a noisy channel.", caption_zh: "一个公式", narration_zh: "因为有一个公式：描述噪声信道容量的香农-哈特利定律。"}
+      - {visual: wave, caption: "B: Bandwidth", narration: "B is the bandwidth, the range of frequencies the channel can carry.", caption_zh: "B：带宽", narration_zh: "B是带宽，也就是信道能传送的频率范围。"}
+      - {visual: channel, caption: "S/N: Signal to Noise", narration: "S over N is the signal-to-noise ratio. More noise means fewer distinguishable levels.", caption_zh: "S/N：信噪比", narration_zh: "S除以N是信噪比。噪声越大，可区分的电平就越少。"}
+      - {visual: timeline, years: ["1924 Nyquist levels", "1928 Hartley rule", "1948 Shannon noise"], caption: "Three Steps", narration: "Nyquist and Hartley counted pulses and levels. Shannon showed how noise sets the true limit.", caption_zh: "三步走", narration_zh: "奈奎斯特和哈特利数脉冲和电平，香农则证明了噪声决定真正的极限。", years_zh: ["1924 奈奎斯特 电平", "1928 哈特利 规则", "1948 香农 噪声"]}
+      - {visual: follow, caption: "Signal Stories", narration: "Follow for more stories from the history of science.", caption_zh: "信号简史", narration_zh: "关注我，看更多科学史故事。"}
